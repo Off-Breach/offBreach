@@ -12,8 +12,7 @@ import java.util.Date;
 @Slf4j
 public class DatabaseConnection {
 
-    Connection config = new Connection();
-    JdbcTemplate template = new JdbcTemplate(config.getDataSource());
+    JdbcTemplate template = new JdbcTemplate();
     HardwareData hwData = new HardwareData();
     private String emailFuncionario = "";
     private String senhaFuncionario = "";
