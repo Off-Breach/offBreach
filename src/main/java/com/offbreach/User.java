@@ -2,24 +2,20 @@ package com.offbreach;
 
 public class User {
 
-    private Integer id;
+//    private Integer id;
     private String nome;
-    private String telefone;
+//    private String telefone;
     private String email;
     private String senha;
-    private Integer responsavel;
-    private Integer fkClinica;
+//    private Integer responsavel;
+//    private Integer fkClinica;
 
     private DatabaseConnection dbConnection = new DatabaseConnection();
 
-    public User(Integer id, String nome, String telefone, String email, String senha, Integer responsavel, Integer fkClinica) {
-        this.id = id;
+    public User(String nome,String email, String senha) {
         this.nome = nome;
-        this.telefone = telefone;
         this.email = email;
         this.senha = senha;
-        this.responsavel = responsavel;
-        this.fkClinica = fkClinica;
     }
 
     public User() {
@@ -29,17 +25,13 @@ public class User {
         return dbConnection;
     }
 
-    public Integer getId() {
-        return id;
-    }
+
 
     public String getNome() {
         return nome;
     }
 
-    public String getTelefone() {
-        return telefone;
-    }
+
 
     public String getEmail() {
         return email;
@@ -47,14 +39,6 @@ public class User {
 
     public String getSenha() {
         return senha;
-    }
-
-    public Integer getResponsavel() {
-        return responsavel;
-    }
-
-    public Integer getFkClinica() {
-        return fkClinica;
     }
     
      @Override
@@ -64,7 +48,6 @@ public class User {
         sb.append("nome=").append(nome);
         sb.append(", email=").append(email);
         sb.append(", senha=").append(senha);
-        sb.append(", fkClinica=").append(fkClinica);
         sb.append(", dbConnection=").append(dbConnection);
         sb.append('}');
         return sb.toString();

@@ -27,11 +27,12 @@ public class DatabaseConnection {
 
     public User getUsuario() {
         List<User> resultUser = new ArrayList<>();
-        String selectUser = String.format("SELECT * FROM funcionario "
+        String selectUser = String.format("SELECT email as email, senha as senha FROM funcionario "
                 + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
         try {
             resultUser = template.query(selectUser, new BeanPropertyRowMapper<>(User.class));
+            System.out.println(template.query(selectUser, new BeanPropertyRowMapper<>(User.class)));
         } catch (EmptyResultDataAccessException e) {
             System.out.println("Nenhum usuário cadastrado");
         }
@@ -41,103 +42,51 @@ public class DatabaseConnection {
 
     public String getEmail() {
         String result = "";
-        String select = String.format("SELECT emailFuncio FROM gerente "
-                + "WHERE emailGerente = '%s' AND senhaGerente = '%s'",
+        String select = String.format("SELECT email FROM funcionario "
+                + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
-
-        try {
-            result = template.queryForObject(select, String.class);
-        } catch (EmptyResultDataAccessException exception) {
-            select = String.format("SELECT emailFuncionario FROM funcionario "
-                    + "WHERE emailFuncionario = '%s' AND senhaFuncionario = '%s'",
-                    this.emailFuncionario, this.senhaFuncionario);
             try {
                 result = template.queryForObject(select, String.class);
             } catch (EmptyResultDataAccessException e) {
                 log.error("Email não cadastrado");
             }
-        }
         return result;
     }
 
     public String getSenha() {
         String result = null;
-        String select = String.format("SELECT senhaGerente FROM gerente "
-                + "WHERE emailGerente = '%s' AND senhaGerente = '%s'",
+        String select = String.format("SELECT senha FROM funcionario "
+                + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
-        try {
-            result = template.queryForObject(select, String.class);
-        } catch (EmptyResultDataAccessException exception) {
-            select = String.format("SELECT senhaFuncionario FROM funcionario "
-                    + "WHERE emailFuncionario = '%s' AND senhaFuncionario = '%s'",
-                    this.emailFuncionario, this.senhaFuncionario);
             try {
                 result = template.queryForObject(select, String.class);
             } catch (EmptyResultDataAccessException e) {
                 log.error("Senha incorreta!");
 
             }
-        }
         return result;
     }
 
     public String getNome() {
         String result = null;
-        String select = String.format("SELECT nomeGerente FROM gerente "
-                + "WHERE emailGerente = '%s'",
+        String select = String.format("SELECT nomeFuncionario FROM funcionario "
+                + "WHERE email = '%s'",
                 this.emailFuncionario);
-        try {
-            result = template.queryForObject(select, String.class);
-        } catch (EmptyResultDataAccessException exception) {
-            select = String.format("SELECT nomeFuncionario FROM funcionario "
-                    + "WHERE emailFuncionario = '%s' AND senhaFuncionario = '%s'",
-                    this.emailFuncionario, this.emailFuncionario);
+
             try {
                 result = template.queryForObject(select, String.class);
             } catch (EmptyResultDataAccessException e) {
                 log.error("Nome não encontrado!");
             }
-        }
         return result;
     }
 
-    public String getGerente() {
-        String result = null;
-        String select = String.format("SELECT idGerente FROM gerente "
-                + "WHERE emailGerente = '%s'",
-                this.emailFuncionario);
-        try {
-            result = template.queryForObject(select, String.class);
-        } catch (EmptyResultDataAccessException exception) {
-            if (this.getFuncionario() != null) {
-                log.info("\nLogando como funcionário");
-            } else {
-                log.error("Gerente não encontrado!");
-            }
-        }
-        return result;
-    }
 
-    public String getFuncionario() {
-        String result = null;
-        String select = String.format("SELECT idFuncionario FROM funcionario "
-                + "WHERE emailFuncionario = '%s'", this.emailFuncionario);
-        try {
-            result = template.queryForObject(select, String.class);
-        } catch (EmptyResultDataAccessException exception) {
-            if (this.getGerente() != null) {
-                log.info("\nLogando como gerente");
-            } else {
-                log.error("Funcionario não encontrado");
-            }
-        }
-        return result;
-    }
 
     public Boolean verifyHostname() {
         String hostname = hwData.getHostname();
         Boolean result;
-        String select = String.format("SELECT hostname FROM maquina "
+        String select = String.format("SELECT hostname FROM servidor "
                 + "WHERE hostname = '%s'",
                 hostname);
         try {
@@ -152,7 +101,7 @@ public class DatabaseConnection {
     public String getMachineId() {
         String hostname = hwData.getHostname();
         String result = null;
-        String select = String.format("SELECT idMaquina FROM maquina "
+        String select = String.format("SELECT idServidor FROM servidor "
                 + "WHERE hostname = '%s'",
                 hostname);
         try {
@@ -165,15 +114,14 @@ public class DatabaseConnection {
     }
 
     public void saveHardwareData() {
-        String fkGerente = this.getGerente();
         hwData.setHostname();
         String hostname = hwData.getHostname();
         String memoriaTotal = hwData.getMemoryData().getTotal().toString();
         String sistema = hwData.getSistema().getSistemaOperacional();
-        String insert = String.format("INSERT INTO maquina(hostname, memoriaTotal, sistemaOperacional,"
+        String insert = String.format("INSERT INTO servidor (hostname, memoriaTotal, sistemaOperacional,"
                 + "fkGerente)"
-                + "VALUES ('%s', %s, '%s', %s)",
-                hostname, memoriaTotal, sistema, fkGerente);
+                + "VALUES ('%s', %s, '%s')",
+                hostname, memoriaTotal, sistema);
         if (this.verifyHostname() == true) {
             try {
                 template.update(insert);
@@ -195,18 +143,16 @@ public class DatabaseConnection {
         String usoRam = hwData.getMemoryData().getEmUso().toString();
         String hora = formatter.format(date);
         String fkMaquina = this.getMachineId();
-        String fkFuncionario = this.getFuncionario();
 
         String insertCpu = String.format("INSERT INTO cpu(temperatura, uso, hora,"
                 + "fkMaquina, fkFuncionario)"
-                + "VALUES ('%s', %s, '%s', %s, %s)",
-                temperatura, usoCpu, hora, fkMaquina, fkFuncionario);
+                + "VALUES ('%s', %s, '%s', %s)",
+                temperatura, usoCpu, hora, fkMaquina);
 
         String insertMemory = String.format("INSERT INTO memoriaRam(uso, horario, "
                 + "fkMaquina, fkFuncionario)"
-                + "VALUES (%s, '%s', %s, %s)",
-                usoRam, hora, fkMaquina, fkFuncionario);
-
+                + "VALUES (%s, '%s', %s)",
+                usoRam, hora, fkMaquina);
         try {
             template.update(insertCpu);
             template.update(insertMemory);

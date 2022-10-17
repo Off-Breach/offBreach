@@ -21,6 +21,7 @@ public class MainMenu extends javax.swing.JFrame {
         loadingIcon.setVisible(false);
     }
 
+
     static MainMenu mainMenu = new MainMenu();
 
     /**
@@ -193,15 +194,17 @@ public class MainMenu extends javax.swing.JFrame {
         mainPage.setLocationRelativeTo(null);
 
 
-
         String email = emailTextField.getText();
         String senha = String.valueOf(passwordTextField.getPassword());
 
         dbConnection.setConnection(email, senha);
-        User user = dbConnection.getUsuario();
+        String emailUser = dbConnection.getEmail();
+        String senhaUser = dbConnection.getSenha();
+        String nomeUser = dbConnection.getNome();
 
 
-        if (user.getEmail().equals(email) && user.getSenha().equals(senha)) {
+        if (emailUser.equals(email) && senhaUser.equals(senha)) {
+            User user = new User(email, senha, nomeUser);
             mainPage.setUser(user);
             mainPage.setUserName(user);
             dbConnection.saveHardwareData();
@@ -211,7 +214,7 @@ public class MainMenu extends javax.swing.JFrame {
             data.cadastrarSistema();
             mainPage.trySaveInLoop();
         }else {
-        }//GEN-FIRST:event_loginButtonMouseClicked
+        }
         loadingIcon.setVisible(true);
     }//GEN-LAST:event_loginButtonMouseClicked
 
