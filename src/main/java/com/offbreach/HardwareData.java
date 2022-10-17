@@ -11,10 +11,10 @@ import java.net.UnknownHostException;
 
 public class HardwareData {
 
-    private Looca looca = new Looca();
-    private Sistema sistema = looca.getSistema();
+    private final Looca looca = new Looca();
+    private final Sistema sistema = looca.getSistema();
     private String hostname = "";
-    private Memoria memoria = looca.getMemoria();
+    private final Memoria memoria = looca.getMemoria();
 
     public void cadastrarSistema() {
 

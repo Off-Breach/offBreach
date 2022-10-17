@@ -1,4 +1,3 @@
-
 package com.offbreach;
 
 import lombok.extern.slf4j.Slf4j;
@@ -7,19 +6,37 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 @Slf4j
 public class DatabaseConnection {
-
-    JdbcTemplate template = new JdbcTemplate();
+    
+    Connection connection = new Connection();
+    JdbcTemplate template = connection.getDataSource();
     HardwareData hwData = new HardwareData();
-    private String emailFuncionario = "";
-    private String senhaFuncionario = "";
+    private String emailFuncionario;
+    private String senhaFuncionario;
 
     public void setConnection(String email, String senha) {
         this.emailFuncionario = email;
         this.senhaFuncionario = senha;
+    }
+
+    public User getUsuario() {
+        List<User> resultUser = new ArrayList<>();
+        String selectUser = String.format("SELECT * FROM funcionario "
+                + "WHERE email = '%s' AND senha = '%s'",
+                this.emailFuncionario, this.senhaFuncionario);
+        try {
+            resultUser = template.query(selectUser, new BeanPropertyRowMapper<>(User.class));
+        } catch (EmptyResultDataAccessException e) {
+            System.out.println("Nenhum usuário cadastrado");
+        }
+        return resultUser.get(0);
+
     }
 
     public String getEmail() {
@@ -37,7 +54,7 @@ public class DatabaseConnection {
             try {
                 result = template.queryForObject(select, String.class);
             } catch (EmptyResultDataAccessException e) {
-                 log.error("Email não cadastrado");
+                log.error("Email não cadastrado");
             }
         }
         return result;

@@ -198,13 +198,10 @@ public class MainMenu extends javax.swing.JFrame {
         String senha = String.valueOf(passwordTextField.getPassword());
 
         dbConnection.setConnection(email, senha);
-        String emailUser = dbConnection.getEmail();
-        String senhaUser = dbConnection.getSenha();
-        String nomeUser = dbConnection.getNome();
+        User user = dbConnection.getUsuario();
 
 
-        if (emailUser.equals(email) && senhaUser.equals(senha)) {
-            User user = new User(email, senha, nomeUser);
+        if (user.getEmail().equals(email) && user.getSenha().equals(senha)) {
             mainPage.setUser(user);
             mainPage.setUserName(user);
             dbConnection.saveHardwareData();

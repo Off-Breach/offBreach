@@ -2,23 +2,43 @@ package com.offbreach;
 
 public class User {
 
-    private String nome = "";
-    private String email = "";
-    private String senha = "";
+    private Integer id;
+    private String nome;
+    private String telefone;
+    private String email;
+    private String senha;
+    private Integer responsavel;
+    private Integer fkClinica;
 
-    DatabaseConnection dbConnection = new DatabaseConnection();
+    private DatabaseConnection dbConnection = new DatabaseConnection();
 
-    public User(String email, String senha, String nome) {
+    public User(Integer id, String nome, String telefone, String email, String senha, Integer responsavel, Integer fkClinica) {
+        this.id = id;
+        this.nome = nome;
+        this.telefone = telefone;
         this.email = email;
         this.senha = senha;
-        this.nome = nome;
+        this.responsavel = responsavel;
+        this.fkClinica = fkClinica;
     }
 
     public User() {
     }
 
+    public DatabaseConnection getDbConnection() {
+        return dbConnection;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
     public String getNome() {
         return nome;
+    }
+
+    public String getTelefone() {
+        return telefone;
     }
 
     public String getEmail() {
@@ -29,8 +49,25 @@ public class User {
         return senha;
     }
 
-    @Override
-    public String toString() {
-        return nome + email + senha;
+    public Integer getResponsavel() {
+        return responsavel;
     }
+
+    public Integer getFkClinica() {
+        return fkClinica;
+    }
+    
+     @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("User{");
+        sb.append("nome=").append(nome);
+        sb.append(", email=").append(email);
+        sb.append(", senha=").append(senha);
+        sb.append(", fkClinica=").append(fkClinica);
+        sb.append(", dbConnection=").append(dbConnection);
+        sb.append('}');
+        return sb.toString();
+    }
+
 }
