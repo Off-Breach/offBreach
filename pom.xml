@@ -26,7 +26,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.cloudstax.cloudfooding.Screen</mainClass>
+                            <mainClass>com.offbreach.UIResponsive</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

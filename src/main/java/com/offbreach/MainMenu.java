@@ -53,7 +53,6 @@ public class MainMenu extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(800, 600));
 
         header.setBackground(new java.awt.Color(9, 80, 111));
         header.setPreferredSize(new java.awt.Dimension(800, 50));
@@ -133,7 +132,6 @@ public class MainMenu extends javax.swing.JFrame {
 
         loadingIcon.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         loadingIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        loadingIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/MnyxU.gif"))); // NOI18N
         loadingIcon.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         loadingIcon.setMaximumSize(new java.awt.Dimension(150, 128));
         loadingIcon.setMinimumSize(new java.awt.Dimension(150, 128));
@@ -201,22 +199,22 @@ public class MainMenu extends javax.swing.JFrame {
         String emailUser = dbConnection.getEmail();
         String senhaUser = dbConnection.getSenha();
         String nomeUser = dbConnection.getNome();
+        String fkClinica = dbConnection.getFkClinica();
 
 
         if (emailUser.equals(email) && senhaUser.equals(senha)) {
-            User user = new User(email, senha, nomeUser);
+            User user = new User(email, senha, nomeUser, fkClinica);
             mainPage.setUser(user);
             mainPage.setUserName(user);
             dbConnection.saveHardwareData();
-            mainPage.getLoocaData(dbConnection);
+            mainPage.getLoocaData();
             mainPage.setVisible(true);
             mainMenu.dispose();
             data.cadastrarSistema();
             mainPage.trySaveInLoop();
         }else {
         }
-        loadingIcon.setVisible(true);
-    }//GEN-LAST:event_loginButtonMouseClicked
+    }                                        
 
     /**
      * @param args the command line arguments

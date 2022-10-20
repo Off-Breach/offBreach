@@ -11,9 +11,9 @@ public class Connection {
         BasicDataSource dataSource = new BasicDataSource();
         
          dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-         dataSource.setUrl("jdbc:mysql://localhost:3306/OffBreach");
+         dataSource.setUrl("jdbc:mysql://localhost:3306/Off_Breach");
          dataSource.setUsername("root");
-         dataSource.setPassword("01M@theus");
+         dataSource.setPassword("sptech");
 
          connection = new JdbcTemplate(dataSource);
     }
