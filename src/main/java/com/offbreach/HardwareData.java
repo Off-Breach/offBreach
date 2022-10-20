@@ -1,37 +1,64 @@
 package com.offbreach;
 
 import com.github.britooo.looca.api.core.Looca;
+import com.github.britooo.looca.api.group.discos.Disco;
+import com.github.britooo.looca.api.group.discos.DiscosGroup;
 import com.github.britooo.looca.api.group.memoria.Memoria;
 import com.github.britooo.looca.api.group.processador.Processador;
 import com.github.britooo.looca.api.group.sistema.Sistema;
 import com.github.britooo.looca.api.group.temperatura.Temperatura;
+import com.github.britooo.looca.api.util.Conversor;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 public class HardwareData {
 
     private final Looca looca = new Looca();
     private final Sistema sistema = looca.getSistema();
     private String hostname = "";
+    private final DiscosGroup discos = looca.getGrupoDeDiscos();
     private final Memoria memoria = looca.getMemoria();
 
     public void cadastrarSistema() {
 
         Temperatura temperatura = looca.getTemperatura();
         Processador processador = looca.getProcessador();
-
-        System.out.println(temperatura);
-        System.out.println(processador);
-        System.out.println(sistema);
     }
 
     public Memoria getMemoryData() {
         return looca.getMemoria();
     }
+    
+    public String getMemoriaEmUso() {
+        return Conversor.formatarBytes(getMemoryData().getEmUso());
+    }
+    
+    public Long getTotalMemoria() {
+        return memoria.getTotal();
+    }
+    
+    public List<Disco> getDiscoData() {
+        return discos.getDiscos();
+    }
+    
+    public Long getTotalDisco(Integer index) {
+        Disco disco = getDiscoData().get(index);
+        return disco.getTamanho();
+    }
+    
+    public String getDiscoNome(Integer index) {
+        Disco disco = getDiscoData().get(index);
+        return disco.getNome();
+    }
+    
+    public Integer getQuantidadeDeDiscos () {
+        return getDiscoData().size();
+    }
 
-    public String getTemperatura() {
-        return looca.getTemperatura().toString();
+    public Double getTemperatura() {
+        return looca.getTemperatura().getTemperatura();
     }
 
     public Processador getProcessador() {

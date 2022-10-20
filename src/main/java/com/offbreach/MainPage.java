@@ -4,6 +4,7 @@
  */
 package com.offbreach;
 
+import com.github.britooo.looca.api.util.Conversor;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,27 +41,28 @@ public class MainPage extends javax.swing.JFrame {
         main = new javax.swing.JPanel();
         dadosServidorView = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        dadosServidorTitulo = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        hostnameLabel = new javax.swing.JLabel();
+        hostnameValue = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        statusLabel = new javax.swing.JLabel();
+        statusValue = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        dataInitLabel = new javax.swing.JLabel();
+        dataInitValue = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
-        jLabel10 = new javax.swing.JLabel();
-        jLabel11 = new javax.swing.JLabel();
+        usoRamLabel = new javax.swing.JLabel();
+        usoRamValue = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
+        usoCpuLabel = new javax.swing.JLabel();
+        usoCpuValue = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
-        jLabel14 = new javax.swing.JLabel();
+        usoDiscoLabel = new javax.swing.JLabel();
+        usoDiscoValue = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -99,54 +101,54 @@ public class MainPage extends javax.swing.JFrame {
         main.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 100, 10));
 
         dadosServidorView.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        dadosServidorView.setPreferredSize(new java.awt.Dimension(200, 200));
+        dadosServidorView.setPreferredSize(new java.awt.Dimension(300, 200));
         dadosServidorView.setLayout(new javax.swing.BoxLayout(dadosServidorView, javax.swing.BoxLayout.Y_AXIS));
 
         jPanel2.setPreferredSize(new java.awt.Dimension(200, 20));
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel1.setText("Dados do Servidor");
-        jPanel2.add(jLabel1);
+        dadosServidorTitulo.setText("Dados do Servidor");
+        jPanel2.add(dadosServidorTitulo);
 
         dadosServidorView.add(jPanel2);
 
         jPanel3.setPreferredSize(new java.awt.Dimension(200, 20));
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel2.setText("Hostname:");
-        jPanel3.add(jLabel2);
+        hostnameLabel.setText("Hostname:");
+        jPanel3.add(hostnameLabel);
 
-        jLabel3.setText("------");
-        jPanel3.add(jLabel3);
+        hostnameValue.setText("------");
+        jPanel3.add(hostnameValue);
 
         dadosServidorView.add(jPanel3);
 
         jPanel4.setPreferredSize(new java.awt.Dimension(200, 20));
         jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel4.setText("Status:");
-        jPanel4.add(jLabel4);
+        statusLabel.setText("Status:");
+        jPanel4.add(statusLabel);
 
-        jLabel5.setText("Ativo");
-        jPanel4.add(jLabel5);
+        statusValue.setText("------");
+        jPanel4.add(statusValue);
 
         dadosServidorView.add(jPanel4);
 
         jPanel5.setPreferredSize(new java.awt.Dimension(200, 20));
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel6.setText("Data de Inicialização:");
-        jPanel5.add(jLabel6);
+        dataInitLabel.setText("Data de Inicialização:");
+        jPanel5.add(dataInitLabel);
 
-        jLabel7.setText("--/--/-- --:--");
-        jPanel5.add(jLabel7);
+        dataInitValue.setText("--/--/-- --:--");
+        jPanel5.add(dataInitValue);
 
         dadosServidorView.add(jPanel5);
 
         main.add(dadosServidorView);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel1.setPreferredSize(new java.awt.Dimension(200, 200));
+        jPanel1.setPreferredSize(new java.awt.Dimension(300, 200));
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.Y_AXIS));
 
         jPanel6.setPreferredSize(new java.awt.Dimension(200, 20));
@@ -160,30 +162,33 @@ public class MainPage extends javax.swing.JFrame {
         jPanel7.setPreferredSize(new java.awt.Dimension(200, 20));
         jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel10.setText("Uso da Ram:");
-        jPanel7.add(jLabel10);
+        usoRamLabel.setText("Uso da Ram:");
+        jPanel7.add(usoRamLabel);
 
-        jLabel11.setText("0%");
-        jPanel7.add(jLabel11);
+        usoRamValue.setText("0%");
+        jPanel7.add(usoRamValue);
 
         jPanel1.add(jPanel7);
 
         jPanel8.setPreferredSize(new java.awt.Dimension(200, 20));
         jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel12.setText("Uso Cpu:");
-        jPanel8.add(jLabel12);
+        usoCpuLabel.setText("Uso Cpu:");
+        jPanel8.add(usoCpuLabel);
 
-        jLabel13.setText("0%");
-        jPanel8.add(jLabel13);
+        usoCpuValue.setText("0%");
+        jPanel8.add(usoCpuValue);
 
         jPanel1.add(jPanel8);
 
         jPanel9.setPreferredSize(new java.awt.Dimension(200, 20));
         jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel14.setText("Uso Discos: 0%");
-        jPanel9.add(jLabel14);
+        usoDiscoLabel.setText("Uso Discos:");
+        jPanel9.add(usoDiscoLabel);
+
+        usoDiscoValue.setText("0");
+        jPanel9.add(usoDiscoValue);
 
         jPanel1.add(jPanel9);
 
@@ -240,13 +245,15 @@ public class MainPage extends javax.swing.JFrame {
         });
     }
 
-    public void getLoocaData(DatabaseConnection dbConnection) {
+    public void getLoocaData() {
         data.setHostname();
-        jLabel13.setText(data.getProcessador().toString());
-//        labelSistema.setText(data.getSistema().toString());
-        jLabel11.setText(data.getMemoryData().toString());
-        jLabel3.setText("Hostame: " + data.getHostname());
-        this.dbConnection = dbConnection;
+        String tempCpuValue = String.format("%.1f", data.getProcessador().getUso());
+        usoCpuValue.setText(tempCpuValue + "%");
+        dataInitValue.setText(Conversor.formatarSegundosDecorridos(data.getSistema().getTempoDeAtividade()));
+        usoRamValue.setText(data.getMemoriaEmUso());
+        statusValue.setText("Ativo");
+        usoDiscoValue.setText(Conversor.formatarBytes(data.getDiscoData().get(0).getLeituras()));
+        hostnameValue.setText(data.getHostname());
     }
 
     public void trySaveInLoop() {
@@ -254,27 +261,21 @@ public class MainPage extends javax.swing.JFrame {
             @Override
             public void run() {
                 dbConnection.saveCpuAndMemoryDataInLoop(usuario);
+                getLoocaData();
             }
-        }, 0, 30000);
+        }, 0, 3000);
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel dadosServidorTitulo;
     private javax.swing.JPanel dadosServidorView;
+    private javax.swing.JLabel dataInitLabel;
+    private javax.swing.JLabel dataInitValue;
     private javax.swing.JPanel footer;
     private javax.swing.JPanel header;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel hostnameLabel;
+    private javax.swing.JLabel hostnameValue;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -286,5 +287,13 @@ public class MainPage extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel main;
+    private javax.swing.JLabel statusLabel;
+    private javax.swing.JLabel statusValue;
+    private javax.swing.JLabel usoCpuLabel;
+    private javax.swing.JLabel usoCpuValue;
+    private javax.swing.JLabel usoDiscoLabel;
+    private javax.swing.JLabel usoDiscoValue;
+    private javax.swing.JLabel usoRamLabel;
+    private javax.swing.JLabel usoRamValue;
     // End of variables declaration//GEN-END:variables
 }

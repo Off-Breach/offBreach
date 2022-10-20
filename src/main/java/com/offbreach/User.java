@@ -8,14 +8,15 @@ public class User {
     private String email;
     private String senha;
 //    private Integer responsavel;
-//    private Integer fkClinica;
+    private String fkClinica;
 
     private DatabaseConnection dbConnection = new DatabaseConnection();
 
-    public User(String nome,String email, String senha) {
+    public User(String nome,String email, String senha, String fkClinica) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
+        this.fkClinica = fkClinica;
     }
 
     public User() {
@@ -39,6 +40,10 @@ public class User {
 
     public String getSenha() {
         return senha;
+    }
+    
+    public String getFkClinica() {
+        return fkClinica;
     }
     
      @Override

@@ -1,5 +1,6 @@
 package com.offbreach;
 
+import com.github.britooo.looca.api.core.Looca;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -13,31 +14,17 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 @Slf4j
 public class DatabaseConnection {
-    
+
     Connection connection = new Connection();
     JdbcTemplate template = connection.getDataSource();
     HardwareData hwData = new HardwareData();
     private String emailFuncionario;
     private String senhaFuncionario;
+    private String fkClinica;
 
     public void setConnection(String email, String senha) {
         this.emailFuncionario = email;
         this.senhaFuncionario = senha;
-    }
-
-    public User getUsuario() {
-        List<User> resultUser = new ArrayList<>();
-        String selectUser = String.format("SELECT email as email, senha as senha FROM funcionario "
-                + "WHERE email = '%s' AND senha = '%s'",
-                this.emailFuncionario, this.senhaFuncionario);
-        try {
-            resultUser = template.query(selectUser, new BeanPropertyRowMapper<>(User.class));
-            System.out.println(template.query(selectUser, new BeanPropertyRowMapper<>(User.class)));
-        } catch (EmptyResultDataAccessException e) {
-            System.out.println("Nenhum usuário cadastrado");
-        }
-        return resultUser.get(0);
-
     }
 
     public String getEmail() {
@@ -45,11 +32,11 @@ public class DatabaseConnection {
         String select = String.format("SELECT email FROM funcionario "
                 + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
-            try {
-                result = template.queryForObject(select, String.class);
-            } catch (EmptyResultDataAccessException e) {
-                log.error("Email não cadastrado");
-            }
+        try {
+            result = template.queryForObject(select, String.class);
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Email não cadastrado");
+        }
         return result;
     }
 
@@ -58,12 +45,12 @@ public class DatabaseConnection {
         String select = String.format("SELECT senha FROM funcionario "
                 + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
-            try {
-                result = template.queryForObject(select, String.class);
-            } catch (EmptyResultDataAccessException e) {
-                log.error("Senha incorreta!");
+        try {
+            result = template.queryForObject(select, String.class);
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Senha incorreta!");
 
-            }
+        }
         return result;
     }
 
@@ -73,15 +60,27 @@ public class DatabaseConnection {
                 + "WHERE email = '%s'",
                 this.emailFuncionario);
 
-            try {
-                result = template.queryForObject(select, String.class);
-            } catch (EmptyResultDataAccessException e) {
-                log.error("Nome não encontrado!");
-            }
+        try {
+            result = template.queryForObject(select, String.class);
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Nome não encontrado!");
+        }
         return result;
     }
 
-
+    public String getFkClinica() {
+        String result = null;
+        String select = String.format("SELECT fkClinica FROM funcionario "
+                + "WHERE email = '%s'",
+                this.emailFuncionario);
+        try {
+            result = template.queryForObject(select, String.class);
+            this.fkClinica = result;
+        } catch (EmptyResultDataAccessException e) {
+            log.error("Não cadastrado a uma clínica");
+        }
+        return result;
+    }
 
     public Boolean verifyHostname() {
         String hostname = hwData.getHostname();
@@ -102,12 +101,13 @@ public class DatabaseConnection {
         String hostname = hwData.getHostname();
         String result = null;
         String select = String.format("SELECT idServidor FROM servidor "
-                + "WHERE hostname = '%s'",
-                hostname);
+                + "WHERE hostname = '%s' AND fkClinica = %s",
+                hostname, this.fkClinica);
         try {
             result = template.queryForObject(select, String.class);
-            log.info("Máquina encontrada com sucesso!");
+//            log.info("Máquina encontrada com sucesso!");
         } catch (EmptyResultDataAccessException exception) {
+            saveHardwareData();
             log.error("Maquina não encontrada");
         }
         return result;
@@ -116,16 +116,16 @@ public class DatabaseConnection {
     public void saveHardwareData() {
         hwData.setHostname();
         String hostname = hwData.getHostname();
-        String memoriaTotal = hwData.getMemoryData().getTotal().toString();
         String sistema = hwData.getSistema().getSistemaOperacional();
-        String insert = String.format("INSERT INTO servidor (hostname, memoriaTotal, sistemaOperacional,"
-                + "fkGerente)"
-                + "VALUES ('%s', %s, '%s')",
-                hostname, memoriaTotal, sistema);
-        if (this.verifyHostname() == true) {
+        String fkClinica = getFkClinica();
+
+        String insert = String.format("INSERT INTO servidor (hostName, sistemaOperacional, fkClinica)"
+                + "VALUES ('%s', '%s', %s)",
+                hostname, sistema, fkClinica);
+        if (this.verifyHostname()) {
             try {
                 template.update(insert);
-                log.info("\nMáquina inserida com sucesso\n");
+//                log.info("\nMáquina inserida com sucesso\n");
             } catch (DataAccessException error) {
                 log.error("Erro ao inserir máquina no banco");
             }
@@ -134,29 +134,76 @@ public class DatabaseConnection {
         }
     }
 
+    public void saveRamFixedData() {
+        String insertRamFixedData = String.format("INSERT INTO ram (fkServidor, qtdRamTotal)"
+                + "VALUES (%s, %s)",
+                getMachineId(), hwData.getTotalMemoria()
+        );
+        try {
+            template.update(insertRamFixedData);
+        } catch (Exception e) {
+            log.error("\nErro ao inserir dados no banco - saveRamFixedData\n");
+        }
+    }
+
+    public void saveCpuFixedData() {
+        String query = String.format("INSERT INTO cpu (nomeCpu, fkServidor)"
+                + "VALUES ('%s', %s)",
+                hwData.getProcessador().getNome(), getMachineId()
+        );
+        try {
+            template.update(query);
+        } catch (Exception e) {
+            log.error("\nErro ao inserir dados no banco - saveCpuFixedData\n");
+        }
+    }
+
+    public String getRamId() {
+        String result = null;
+        String query = String.format("SELECT idRam FROM ram WHERE fkServidor = %s", getMachineId());
+        try {
+            result = template.queryForObject(query, String.class);
+        } catch (Exception e) {
+            saveRamFixedData();
+        }
+        return result;
+    }
+
+    public String getCpuId() {
+        String result = null;
+        System.out.println(getMachineId());
+        String query = String.format("SELECT idCpu FROM cpu WHERE fkServidor = %s", getMachineId());
+        try {
+            result = template.queryForObject(query, String.class);
+        } catch (Exception e) {
+            saveCpuFixedData();
+            log.error("\nErro ao conseguir os dados do banco - getCpuId()\n");
+        }
+        return result;
+    }
+
     public void saveCpuAndMemoryDataInLoop(User funcionario) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
 
-        String temperatura = hwData.getTemperatura();
+        Double temperatura = hwData.getTemperatura();
         Double usoCpu = hwData.getProcessador().getUso();
         String usoRam = hwData.getMemoryData().getEmUso().toString();
         String hora = formatter.format(date);
-        String fkMaquina = this.getMachineId();
+        String fkRam = getRamId();
+        String fkCpu = getCpuId();
 
-        String insertCpu = String.format("INSERT INTO cpu(temperatura, uso, hora,"
-                + "fkMaquina, fkFuncionario)"
-                + "VALUES ('%s', %s, '%s', %s)",
-                temperatura, usoCpu, hora, fkMaquina);
+        String insertCpu = String.format("INSERT INTO dados_cpu(fkCpu, temperatura, uso, dtDado)"
+                + "VALUES (%s, %s, %s, '%s')",
+                fkCpu, temperatura, usoCpu, hora);
 
-        String insertMemory = String.format("INSERT INTO memoriaRam(uso, horario, "
-                + "fkMaquina, fkFuncionario)"
-                + "VALUES (%s, '%s', %s)",
-                usoRam, hora, fkMaquina);
+        String insertMemory = String.format("INSERT INTO dados_ram(fkRam, uso, dtDado) "
+                + "VALUES (%s, %s, '%s')",
+                fkRam, usoRam, hora);
         try {
             template.update(insertCpu);
             template.update(insertMemory);
-            log.info("\nDados inseridos com sucesso\n");
+//            log.info("\nDados inseridos com sucesso\n");
         } catch (DataAccessException error) {
             log.error("\nErro ao inserir dados no banco\n");
         }
