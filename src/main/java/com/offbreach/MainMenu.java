@@ -206,6 +206,7 @@ public class MainMenu extends javax.swing.JFrame {
             User user = new User(email, senha, nomeUser, fkClinica);
             mainPage.setUser(user);
             mainPage.setUserName(user);
+            dbConnection.fkClinica = dbConnection.getFkClinica();
             dbConnection.saveHardwareData();
             mainPage.getLoocaData();
             mainPage.setVisible(true);

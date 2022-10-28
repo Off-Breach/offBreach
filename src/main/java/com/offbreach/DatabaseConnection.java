@@ -1,16 +1,12 @@
 package com.offbreach;
 
-import com.github.britooo.looca.api.core.Looca;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 
 @Slf4j
 public class DatabaseConnection {
@@ -20,7 +16,8 @@ public class DatabaseConnection {
     HardwareData hwData = new HardwareData();
     private String emailFuncionario;
     private String senhaFuncionario;
-    private String fkClinica;
+    public String fkClinica = "1";
+    public String fkServidor = "2";
 
     public void setConnection(String email, String senha) {
         this.emailFuncionario = email;
@@ -29,7 +26,7 @@ public class DatabaseConnection {
 
     public String getEmail() {
         String result = "";
-        String select = String.format("SELECT email FROM funcionario "
+        String select = String.format("SELECT email FROM Funcionario "
                 + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
         try {
@@ -70,7 +67,8 @@ public class DatabaseConnection {
 
     public String getFkClinica() {
         String result = null;
-        String select = String.format("SELECT fkClinica FROM funcionario "
+        String select = String.format(""
+                + "SELECT fkClinica FROM funcionario "
                 + "WHERE email = '%s'",
                 this.emailFuncionario);
         try {
@@ -85,9 +83,9 @@ public class DatabaseConnection {
     public Boolean verifyHostname() {
         String hostname = hwData.getHostname();
         Boolean result;
-        String select = String.format("SELECT hostname FROM servidor "
-                + "WHERE hostname = '%s'",
-                hostname);
+        String select = String.format("SELECT idServidor FROM servidor "
+                + "WHERE hostname = '%s' AND fkClinica = %s",
+                hostname, fkClinica);
         try {
             template.queryForObject(select, String.class);
             result = false;
@@ -98,17 +96,20 @@ public class DatabaseConnection {
     }
 
     public String getMachineId() {
+        hwData.setHostname();
         String hostname = hwData.getHostname();
         String result = null;
         String select = String.format("SELECT idServidor FROM servidor "
                 + "WHERE hostname = '%s' AND fkClinica = %s",
                 hostname, this.fkClinica);
+        System.out.println(hostname);
+        System.out.println(this.fkClinica);
         try {
             result = template.queryForObject(select, String.class);
+            fkServidor = result;
 //            log.info("Máquina encontrada com sucesso!");
         } catch (EmptyResultDataAccessException exception) {
             saveHardwareData();
-            log.error("Maquina não encontrada");
         }
         return result;
     }
@@ -117,7 +118,6 @@ public class DatabaseConnection {
         hwData.setHostname();
         String hostname = hwData.getHostname();
         String sistema = hwData.getSistema().getSistemaOperacional();
-        String fkClinica = getFkClinica();
 
         String insert = String.format("INSERT INTO servidor (hostName, sistemaOperacional, fkClinica)"
                 + "VALUES ('%s', '%s', %s)",
@@ -135,10 +135,12 @@ public class DatabaseConnection {
     }
 
     public void saveRamFixedData() {
-        String insertRamFixedData = String.format("INSERT INTO ram (fkServidor, qtdRamTotal)"
+        String insertRamFixedData = String.format("INSERT INTO ram (fkServidor, qtdRamTotal) "
                 + "VALUES (%s, %s)",
-                getMachineId(), hwData.getTotalMemoria()
+                fkServidor, hwData.getTotalMemoria()
         );
+        System.out.println(fkServidor);
+        System.out.println(hwData.getTotalMemoria());
         try {
             template.update(insertRamFixedData);
         } catch (Exception e) {
@@ -149,7 +151,7 @@ public class DatabaseConnection {
     public void saveCpuFixedData() {
         String query = String.format("INSERT INTO cpu (nomeCpu, fkServidor)"
                 + "VALUES ('%s', %s)",
-                hwData.getProcessador().getNome(), getMachineId()
+                hwData.getProcessador().getNome(), fkServidor
         );
         try {
             template.update(query);
@@ -160,24 +162,32 @@ public class DatabaseConnection {
 
     public String getRamId() {
         String result = null;
-        String query = String.format("SELECT idRam FROM ram WHERE fkServidor = %s", getMachineId());
+        String query = String.format(""
+                + "SELECT idRam FROM ram "
+                + "JOIN servidor ON fkServidor = idServidor "
+                + "WHERE fkServidor = %s AND hostName = '%s'",
+                getMachineId(), hwData.getHostname());
         try {
             result = template.queryForObject(query, String.class);
         } catch (Exception e) {
             saveRamFixedData();
+//            log.error("\nErro ao conseguir os dados do banco - getRamId()\n");
         }
         return result;
     }
 
     public String getCpuId() {
         String result = null;
-        System.out.println(getMachineId());
-        String query = String.format("SELECT idCpu FROM cpu WHERE fkServidor = %s", getMachineId());
+        String query = String.format(""
+                + "SELECT idCpu FROM cpu "
+                + "JOIN servidor ON fkServidor = idServidor "
+                + "WHERE fkServidor = %s AND hostName = '%s'",
+                getMachineId(), hwData.getHostname());
         try {
             result = template.queryForObject(query, String.class);
         } catch (Exception e) {
             saveCpuFixedData();
-            log.error("\nErro ao conseguir os dados do banco - getCpuId()\n");
+//            log.error("\nErro ao conseguir os dados do banco - getCpuId()\n");
         }
         return result;
     }
@@ -193,19 +203,20 @@ public class DatabaseConnection {
         String fkRam = getRamId();
         String fkCpu = getCpuId();
 
-        String insertCpu = String.format("INSERT INTO dados_cpu(fkCpu, temperatura, uso, dtDado)"
+        String insertCpu = String.format("INSERT INTO DadosCpu(fkCpu, temperatura, uso, dtDado)"
                 + "VALUES (%s, %s, %s, '%s')",
                 fkCpu, temperatura, usoCpu, hora);
 
-        String insertMemory = String.format("INSERT INTO dados_ram(fkRam, uso, dtDado) "
+        String insertMemory = String.format("INSERT INTO DadosRam(fkRam, uso, dtDado) "
                 + "VALUES (%s, %s, '%s')",
                 fkRam, usoRam, hora);
         try {
             template.update(insertCpu);
             template.update(insertMemory);
-//            log.info("\nDados inseridos com sucesso\n");
+            log.info("\nDados inseridos com sucesso\n");
         } catch (DataAccessException error) {
             log.error("\nErro ao inserir dados no banco\n");
+            log.error(error.getMessage());
         }
     }
 }

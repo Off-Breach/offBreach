@@ -263,7 +263,7 @@ public class MainPage extends javax.swing.JFrame {
                 dbConnection.saveCpuAndMemoryDataInLoop(usuario);
                 getLoocaData();
             }
-        }, 0, 3000);
+        }, 0, 10000);
     }
 
 
