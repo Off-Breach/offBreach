@@ -3,6 +3,7 @@ package com.offbreach;
 import com.github.britooo.looca.api.core.Looca;
 import com.github.britooo.looca.api.group.discos.Disco;
 import com.github.britooo.looca.api.group.discos.DiscosGroup;
+import com.github.britooo.looca.api.group.discos.Volume;
 import com.github.britooo.looca.api.group.memoria.Memoria;
 import com.github.britooo.looca.api.group.processador.Processador;
 import com.github.britooo.looca.api.group.sistema.Sistema;
@@ -43,9 +44,17 @@ public class HardwareData {
         return discos.getDiscos();
     }
     
-    public Long getTotalDisco(Integer index) {
+    public Long getTotalDisco() {
+        return discos.getTamanhoTotal();
+    }
+    
+    public Long getUsoDisco(Integer index) {
         Disco disco = getDiscoData().get(index);
-        return disco.getTamanho();
+        return disco.getTempoDeTransferencia();
+    }
+    
+    public Long getDisponivelDisco(Integer index){
+        return discos.getVolumes().get(index).getDisponivel();
     }
     
     public String getDiscoNome(Integer index) {

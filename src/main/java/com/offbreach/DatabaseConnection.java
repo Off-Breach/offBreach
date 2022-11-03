@@ -11,8 +11,10 @@ import java.util.Date;
 @Slf4j
 public class DatabaseConnection {
 
-    Connection connection = new Connection();
-    JdbcTemplate template = connection.getDataSource();
+    SqlServerConnection remoteConnection = new SqlServerConnection();
+    JdbcTemplate sqlServerConnection = remoteConnection.getDataSource();
+    SqlLocalConnection localConnection = new SqlLocalConnection();
+    JdbcTemplate sqlLocalConnection = localConnection.getDataSource();
     HardwareData hwData = new HardwareData();
     private String emailFuncionario;
     private String senhaFuncionario;
@@ -30,7 +32,7 @@ public class DatabaseConnection {
                 + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
         try {
-            result = template.queryForObject(select, String.class);
+            result = sqlServerConnection.queryForObject(select, String.class);
         } catch (EmptyResultDataAccessException e) {
             log.error("Email não cadastrado");
         }
@@ -43,7 +45,7 @@ public class DatabaseConnection {
                 + "WHERE email = '%s' AND senha = '%s'",
                 this.emailFuncionario, this.senhaFuncionario);
         try {
-            result = template.queryForObject(select, String.class);
+            result = sqlServerConnection.queryForObject(select, String.class);
         } catch (EmptyResultDataAccessException e) {
             log.error("Senha incorreta!");
 
@@ -58,7 +60,7 @@ public class DatabaseConnection {
                 this.emailFuncionario);
 
         try {
-            result = template.queryForObject(select, String.class);
+            result = sqlServerConnection.queryForObject(select, String.class);
         } catch (EmptyResultDataAccessException e) {
             log.error("Nome não encontrado!");
         }
@@ -72,7 +74,7 @@ public class DatabaseConnection {
                 + "WHERE email = '%s'",
                 this.emailFuncionario);
         try {
-            result = template.queryForObject(select, String.class);
+            result = sqlServerConnection.queryForObject(select, String.class);
             this.fkClinica = result;
         } catch (EmptyResultDataAccessException e) {
             log.error("Não cadastrado a uma clínica");
@@ -87,7 +89,7 @@ public class DatabaseConnection {
                 + "WHERE hostname = '%s' AND fkClinica = %s",
                 hostname, fkClinica);
         try {
-            template.queryForObject(select, String.class);
+            sqlServerConnection.queryForObject(select, String.class);
             result = false;
         } catch (EmptyResultDataAccessException exception) {
             result = true;
@@ -105,7 +107,7 @@ public class DatabaseConnection {
         System.out.println(hostname);
         System.out.println(this.fkClinica);
         try {
-            result = template.queryForObject(select, String.class);
+            result = sqlServerConnection.queryForObject(select, String.class);
             fkServidor = result;
 //            log.info("Máquina encontrada com sucesso!");
         } catch (EmptyResultDataAccessException exception) {
@@ -124,7 +126,7 @@ public class DatabaseConnection {
                 hostname, sistema, fkClinica);
         if (this.verifyHostname()) {
             try {
-                template.update(insert);
+                sqlServerConnection.update(insert);
 //                log.info("\nMáquina inserida com sucesso\n");
             } catch (DataAccessException error) {
                 log.error("Erro ao inserir máquina no banco");
@@ -142,7 +144,7 @@ public class DatabaseConnection {
         System.out.println(fkServidor);
         System.out.println(hwData.getTotalMemoria());
         try {
-            template.update(insertRamFixedData);
+            sqlServerConnection.update(insertRamFixedData);
         } catch (Exception e) {
             log.error("\nErro ao inserir dados no banco - saveRamFixedData\n");
         }
@@ -154,7 +156,7 @@ public class DatabaseConnection {
                 hwData.getProcessador().getNome(), fkServidor
         );
         try {
-            template.update(query);
+            sqlServerConnection.update(query);
         } catch (Exception e) {
             log.error("\nErro ao inserir dados no banco - saveCpuFixedData\n");
         }
@@ -168,7 +170,7 @@ public class DatabaseConnection {
                 + "WHERE fkServidor = %s AND hostName = '%s'",
                 getMachineId(), hwData.getHostname());
         try {
-            result = template.queryForObject(query, String.class);
+            result = sqlServerConnection.queryForObject(query, String.class);
         } catch (Exception e) {
             saveRamFixedData();
 //            log.error("\nErro ao conseguir os dados do banco - getRamId()\n");
@@ -184,7 +186,7 @@ public class DatabaseConnection {
                 + "WHERE fkServidor = %s AND hostName = '%s'",
                 getMachineId(), hwData.getHostname());
         try {
-            result = template.queryForObject(query, String.class);
+            result = sqlServerConnection.queryForObject(query, String.class);
         } catch (Exception e) {
             saveCpuFixedData();
 //            log.error("\nErro ao conseguir os dados do banco - getCpuId()\n");
@@ -211,8 +213,9 @@ public class DatabaseConnection {
                 + "VALUES (%s, %s, '%s')",
                 fkRam, usoRam, hora);
         try {
-            template.update(insertCpu);
-            template.update(insertMemory);
+            sqlServerConnection.update(insertCpu);
+            sqlServerConnection.update(insertMemory);
+//            sqlLocalConnection.update(hora);
             log.info("\nDados inseridos com sucesso\n");
         } catch (DataAccessException error) {
             log.error("\nErro ao inserir dados no banco\n");

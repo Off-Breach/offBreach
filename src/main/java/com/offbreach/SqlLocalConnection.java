@@ -3,11 +3,14 @@ package com.offbreach;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class Connection {
-
+/**
+ *
+ * @author rafae
+ */
+public class SqlLocalConnection {
     private JdbcTemplate connection;
-
-    public Connection() {
+    
+    public SqlLocalConnection() {
         BasicDataSource dataSource = new BasicDataSource();
         
          dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
@@ -17,7 +20,7 @@ public class Connection {
 
          connection = new JdbcTemplate(dataSource);
     }
-
+    
     public JdbcTemplate getDataSource() {
         return connection;
     }
