@@ -21,6 +21,7 @@ public class MainPage extends javax.swing.JFrame {
     public DatabaseConnection dbConnection = new DatabaseConnection();
     public HardwareData data = new HardwareData();
     public User usuario = new User();
+    public DetectorUso detectorUso = new DetectorUso();
     public MainPage() {
         initComponents();
     }
@@ -247,7 +248,7 @@ public class MainPage extends javax.swing.JFrame {
 
     public void getLoocaData() {
         data.setHostname();
-        String tempCpuValue = String.format("%.1f", data.getProcessador().getUso());
+        String tempCpuValue = String.format("%.1f", (data.getProcessador().getUso() * 1.5));
         usoCpuValue.setText(tempCpuValue + "%");
         dataInitValue.setText(Conversor.formatarSegundosDecorridos(data.getSistema().getTempoDeAtividade()));
         usoRamValue.setText(data.getMemoriaEmUso());
@@ -260,8 +261,9 @@ public class MainPage extends javax.swing.JFrame {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                dbConnection.saveCpuAndMemoryDataInLoop(usuario);
+                dbConnection.saveDataInLoop(usuario);
                 getLoocaData();
+                System.out.println(detectorUso.calculateUse(0.0));
             }
         }, 0, 10000);
     }

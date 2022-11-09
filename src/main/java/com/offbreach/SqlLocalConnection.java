@@ -13,8 +13,8 @@ public class SqlLocalConnection {
     public SqlLocalConnection() {
         BasicDataSource dataSource = new BasicDataSource();
         
-         dataSource.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-         dataSource.setUrl("jdbc:sqlserver://servidor-off-breach.database.windows.net;database=off_breach;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net");
+         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+         dataSource.setUrl("jdbc:mysql://localhost:3306/Off_Breach");
          dataSource.setUsername("off_breach");
          dataSource.setPassword("#Gfgrupo3");
 

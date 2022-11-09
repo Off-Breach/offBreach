@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 @Slf4j
 public class DatabaseConnection {
@@ -82,6 +83,36 @@ public class DatabaseConnection {
         return result;
     }
 
+    public void createLocalDatabase() {
+        String query = ""
+                + "CREATE DATABASE offbreach;\n"
+                + "USE offbreach;\n"
+                + "CREATE TABLE dadosRam (\n"
+                + "idDadoRam INT PRIMARY KEY AUTO_INCREMENT,\n"
+                + "uso FLOAT,\n"
+                + "dtDado DATETIME,\n"
+                + "fkRam INT\n"
+                + ");\n"
+                + "CREATE TABLE dadosCpu (\n"
+                + "idDadoCpu INT PRIMARY KEY AUTO_INCREMENT,\n"
+                + "temperatura FLOAT,\n"
+                + "uso FLOAT,\n"
+                + "dtDado DATETIME,\n"
+                + "fkCpu INT\n"
+                + ");\n"
+                + "CREATE TABLE dadosDisco (\n"
+                + "idDadoDisco INT PRIMARY KEY AUTO_INCREMENT,\n"
+                + "uso LONG,\n"
+                + "dtDado DATETIME,\n"
+                + "fkDisco INT\n"
+                + ");";
+        try {
+            sqlLocalConnection.update(query);
+        } catch (Exception e) {
+            
+        }
+    }
+
     public Boolean verifyHostname() {
         String hostname = hwData.getHostname();
         Boolean result;
@@ -104,8 +135,6 @@ public class DatabaseConnection {
         String select = String.format("SELECT idServidor FROM servidor "
                 + "WHERE hostname = '%s' AND fkClinica = %s",
                 hostname, this.fkClinica);
-        System.out.println(hostname);
-        System.out.println(this.fkClinica);
         try {
             result = sqlServerConnection.queryForObject(select, String.class);
             fkServidor = result;
@@ -141,8 +170,6 @@ public class DatabaseConnection {
                 + "VALUES (%s, %s)",
                 fkServidor, hwData.getTotalMemoria()
         );
-        System.out.println(fkServidor);
-        System.out.println(hwData.getTotalMemoria());
         try {
             sqlServerConnection.update(insertRamFixedData);
         } catch (Exception e) {
@@ -154,6 +181,18 @@ public class DatabaseConnection {
         String query = String.format("INSERT INTO cpu (nomeCpu, fkServidor)"
                 + "VALUES ('%s', %s)",
                 hwData.getProcessador().getNome(), fkServidor
+        );
+        try {
+            sqlServerConnection.update(query);
+        } catch (Exception e) {
+            log.error("\nErro ao inserir dados no banco - saveCpuFixedData\n");
+        }
+    }
+
+    public void saveDiskFixedData() {
+        String query = String.format("INSERT INTO disco (nomeDisco, tamanho, fkServidor)"
+                + "VALUES ('%s', %s, %s)",
+                hwData.getDiscoNome(0), hwData.getTotalDisco(), fkServidor
         );
         try {
             sqlServerConnection.update(query);
@@ -194,16 +233,36 @@ public class DatabaseConnection {
         return result;
     }
 
-    public void saveCpuAndMemoryDataInLoop(User funcionario) {
+    public String getDiskId() {
+        String result = null;
+        String query = String.format(""
+                + "SELECT idDisco FROM disco "
+                + "JOIN servidor ON fkServidor = idServidor "
+                + "WHERE fkServidor = %s AND hostName = '%s'",
+                getMachineId(), hwData.getHostname()
+        );
+        try {
+            result = sqlServerConnection.queryForObject(query, String.class);
+        } catch (Exception e) {
+            saveDiskFixedData();
+        }
+        return result;
+    }
+
+    public void saveDataInLoop(User funcionario) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
 
         Double temperatura = hwData.getTemperatura();
         Double usoCpu = hwData.getProcessador().getUso();
         String usoRam = hwData.getMemoryData().getEmUso().toString();
+        Long usoDisk = hwData.getUsoDisco();
+        formatter.setTimeZone(TimeZone.getDefault());
         String hora = formatter.format(date);
         String fkRam = getRamId();
         String fkCpu = getCpuId();
+        String fkDisk = getDiskId();
+        System.out.println(hora);
 
         String insertCpu = String.format("INSERT INTO DadosCpu(fkCpu, temperatura, uso, dtDado)"
                 + "VALUES (%s, %s, %s, '%s')",
@@ -212,10 +271,14 @@ public class DatabaseConnection {
         String insertMemory = String.format("INSERT INTO DadosRam(fkRam, uso, dtDado) "
                 + "VALUES (%s, %s, '%s')",
                 fkRam, usoRam, hora);
+
+        String insertDisk = String.format("INSERT INTO DadosDisco(fkDisco, uso, dtDado) "
+                + "VALUES (%s, %s, '%s')",
+                fkDisk, usoDisk, hora);
         try {
             sqlServerConnection.update(insertCpu);
             sqlServerConnection.update(insertMemory);
-//            sqlLocalConnection.update(hora);
+            sqlServerConnection.update(insertDisk);
             log.info("\nDados inseridos com sucesso\n");
         } catch (DataAccessException error) {
             log.error("\nErro ao inserir dados no banco\n");

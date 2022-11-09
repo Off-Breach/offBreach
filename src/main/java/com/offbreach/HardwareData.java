@@ -48,13 +48,12 @@ public class HardwareData {
         return discos.getTamanhoTotal();
     }
     
-    public Long getUsoDisco(Integer index) {
-        Disco disco = getDiscoData().get(index);
-        return disco.getTempoDeTransferencia();
+    public Long getUsoDisco() {
+        return getTotalDisco() - getDisponivelDisco();
     }
     
-    public Long getDisponivelDisco(Integer index){
-        return discos.getVolumes().get(index).getDisponivel();
+    public Long getDisponivelDisco(){
+        return discos.getVolumes().get(0).getDisponivel();
     }
     
     public String getDiscoNome(Integer index) {
