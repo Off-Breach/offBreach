@@ -150,13 +150,13 @@ public class DatabaseConnection {
         String hostname = hwData.getHostname();
         String sistema = hwData.getSistema().getSistemaOperacional();
 
-        String insert = String.format("INSERT INTO servidor (hostName, sistemaOperacional, fkClinica)"
-                + "VALUES ('%s', '%s', %s)",
-                hostname, sistema, fkClinica);
+        String insert = String.format("INSERT INTO servidor (hostName, sistemaOperacional, popularName, fkClinica)"
+                + "VALUES ('%s', '%s', '%s', %s)",
+                hostname, sistema, hostname, fkClinica);
         if (this.verifyHostname()) {
             try {
                 sqlServerConnection.update(insert);
-//                log.info("\nMáquina inserida com sucesso\n");
+                log.info("\nMáquina inserida com sucesso\n");
             } catch (DataAccessException error) {
                 log.error("Erro ao inserir máquina no banco");
             }
@@ -256,13 +256,13 @@ public class DatabaseConnection {
         Double temperatura = hwData.getTemperatura();
         Double usoCpu = hwData.getProcessador().getUso();
         String usoRam = hwData.getMemoryData().getEmUso().toString();
-        Long usoDisk = hwData.getUsoDisco();
+        Double tempoAtividadeDisco = hwData.getTempoAtividadeDisco();
+        Double usoDisk = hwData.getUsoDisco();
         formatter.setTimeZone(TimeZone.getDefault());
         String hora = formatter.format(date);
         String fkRam = getRamId();
         String fkCpu = getCpuId();
         String fkDisk = getDiskId();
-        System.out.println(hora);
 
         String insertCpu = String.format("INSERT INTO DadosCpu(fkCpu, temperatura, uso, dtDado)"
                 + "VALUES (%s, %s, %s, '%s')",
@@ -272,9 +272,9 @@ public class DatabaseConnection {
                 + "VALUES (%s, %s, '%s')",
                 fkRam, usoRam, hora);
 
-        String insertDisk = String.format("INSERT INTO DadosDisco(fkDisco, uso, dtDado) "
-                + "VALUES (%s, %s, '%s')",
-                fkDisk, usoDisk, hora);
+        String insertDisk = String.format("INSERT INTO DadosDisco(fkDisco, uso, tempoAtividade, dtDado) "
+                + "VALUES (%s, %s, %s, '%s')",
+                fkDisk, usoDisk, tempoAtividadeDisco, hora);
         try {
             sqlServerConnection.update(insertCpu);
             sqlServerConnection.update(insertMemory);

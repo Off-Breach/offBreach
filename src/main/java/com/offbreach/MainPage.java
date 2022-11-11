@@ -263,9 +263,8 @@ public class MainPage extends javax.swing.JFrame {
             public void run() {
                 dbConnection.saveDataInLoop(usuario);
                 getLoocaData();
-                System.out.println(detectorUso.calculateUse(0.0));
             }
-        }, 0, 10000);
+        }, 0, 5000);
     }
 
 

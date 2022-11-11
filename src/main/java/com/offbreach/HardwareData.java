@@ -13,6 +13,9 @@ import com.github.britooo.looca.api.util.Conversor;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import oshi.SystemInfo;
+import oshi.hardware.HWDiskStore;
+import oshi.util.Util;
 
 public class HardwareData {
 
@@ -31,37 +34,48 @@ public class HardwareData {
     public Memoria getMemoryData() {
         return looca.getMemoria();
     }
-    
+
     public String getMemoriaEmUso() {
         return Conversor.formatarBytes(getMemoryData().getEmUso());
     }
-    
+
     public Long getTotalMemoria() {
         return memoria.getTotal();
     }
-    
+
     public List<Disco> getDiscoData() {
         return discos.getDiscos();
     }
-    
+
     public Long getTotalDisco() {
         return discos.getTamanhoTotal();
     }
-    
-    public Long getUsoDisco() {
-        return getTotalDisco() - getDisponivelDisco();
+
+    public Double getTempoAtividadeDisco() {
+        HWDiskStore disk = new SystemInfo().getHardware().getDiskStores().get(0);
+        Long firstGetTransferTime = disk.getTransferTime();
+        Long firstGetTimeStamp = disk.getTimeStamp();
+        Util.sleep(10000);
+        disk.updateAttributes();
+        Long secondGetTransferTime = disk.getTransferTime();
+        Long secondGetTimeStamp = disk.getTimeStamp();
+        return (double) (secondGetTransferTime - firstGetTransferTime) / (secondGetTimeStamp - firstGetTimeStamp) * 100;
     }
-    
-    public Long getDisponivelDisco(){
+
+    public Long getDisponivelDisco() {
         return discos.getVolumes().get(0).getDisponivel();
     }
     
+    public Double getUsoDisco() {
+        return (double) getTotalDisco() - getDisponivelDisco();
+    }
+
     public String getDiscoNome(Integer index) {
         Disco disco = getDiscoData().get(index);
         return disco.getNome();
     }
-    
-    public Integer getQuantidadeDeDiscos () {
+
+    public Integer getQuantidadeDeDiscos() {
         return getDiscoData().size();
     }
 
@@ -76,8 +90,8 @@ public class HardwareData {
     public Sistema getSistema() {
         return looca.getSistema();
     }
-    
-    public String getHostname(){
+
+    public String getHostname() {
         return this.hostname;
     }
 
@@ -87,6 +101,7 @@ public class HardwareData {
             this.hostname = address.getHostName();
         } catch (UnknownHostException e) {
             System.out.println("[Erro] - Não foi possível obter o hostname");
+            this.hostname = "hostname";
         }
     }
 }
