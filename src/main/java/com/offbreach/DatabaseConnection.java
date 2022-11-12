@@ -109,7 +109,7 @@ public class DatabaseConnection {
         try {
             sqlLocalConnection.update(query);
         } catch (Exception e) {
-            
+
         }
     }
 
@@ -143,6 +143,48 @@ public class DatabaseConnection {
             saveHardwareData();
         }
         return result;
+    }
+
+    public String getServerPublicName() {
+        String idServidor = getMachineId();
+        String result = null;
+        String select = String.format("SELECT popularName FROM servidor "
+                + "WHERE idServidor = %s",
+                idServidor);
+        try {
+            result = sqlServerConnection.queryForObject(select, String.class);
+        } catch (Exception e) {
+            result = hwData.getHostname();
+        }
+        return result;
+    }
+
+    public Integer getServerDangerStatus() {
+        String idServidor = getMachineId();
+        String result = null;
+        String query = String.format(""
+                + "SELECT statusPerigo FROM servidor"
+                + "WHERE idServidor = %s",
+                idServidor);
+        try {
+            result = sqlServerConnection.queryForObject(query, String.class);
+        } catch (Exception e) {
+            log.error("\nErro ao conseguir o status de perigo da máquina\n");
+            result = "0";
+        }
+        return Integer.parseInt(result);
+    }
+
+    public void saveServerDangerStatus(Integer status) {
+        String idServidor = getMachineId();
+        String query = String.format(""
+                + "UPDATE servidor set statusPerigo = %s WHERE idServidor = %s",
+                status, idServidor);
+        try {
+            sqlServerConnection.update(query);
+        } catch (Exception e) {
+            log.error("\n Erro ao inserir statusPeigo\n");
+        }
     }
 
     public void saveHardwareData() {

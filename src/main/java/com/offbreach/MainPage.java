@@ -254,10 +254,10 @@ public class MainPage extends javax.swing.JFrame {
         usoRamValue.setText(data.getMemoriaEmUso());
         statusValue.setText("Ativo");
         usoDiscoValue.setText(Conversor.formatarBytes(data.getDiscoData().get(0).getLeituras()));
-        hostnameValue.setText(data.getHostname());
     }
 
     public void trySaveInLoop() {
+        hostnameValue.setText(dbConnection.getServerPublicName());
         timer.schedule(new TimerTask() {
             @Override
             public void run() {

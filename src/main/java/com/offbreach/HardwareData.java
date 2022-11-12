@@ -55,7 +55,7 @@ public class HardwareData {
         HWDiskStore disk = new SystemInfo().getHardware().getDiskStores().get(0);
         Long firstGetTransferTime = disk.getTransferTime();
         Long firstGetTimeStamp = disk.getTimeStamp();
-        Util.sleep(10000);
+        Util.sleep(5000);
         disk.updateAttributes();
         Long secondGetTransferTime = disk.getTransferTime();
         Long secondGetTimeStamp = disk.getTimeStamp();
