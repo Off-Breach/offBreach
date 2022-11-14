@@ -33,6 +33,7 @@ public class DatabaseConnection {
                 this.emailFuncionario, this.senhaFuncionario);
         try {
             result = sqlServerConnection.queryForObject(select, String.class);
+            log.info("Email cadastrado");
         } catch (EmptyResultDataAccessException e) {
             log.error("Email não cadastrado");
         }
@@ -46,6 +47,7 @@ public class DatabaseConnection {
                 this.emailFuncionario, this.senhaFuncionario);
         try {
             result = sqlServerConnection.queryForObject(select, String.class);
+            log.info("Senha correta!");
         } catch (EmptyResultDataAccessException e) {
             log.error("Senha incorreta!");
 
@@ -61,6 +63,7 @@ public class DatabaseConnection {
 
         try {
             result = sqlServerConnection.queryForObject(select, String.class);
+            log.info("Nome encontrado");
         } catch (EmptyResultDataAccessException e) {
             log.error("Nome não encontrado!");
         }
@@ -76,6 +79,7 @@ public class DatabaseConnection {
         try {
             result = sqlServerConnection.queryForObject(select, String.class);
             this.fkClinica = result;
+            log.info("Cadastrado a uma clínica");
         } catch (EmptyResultDataAccessException e) {
             log.error("Não cadastrado a uma clínica");
         }
@@ -121,8 +125,10 @@ public class DatabaseConnection {
         try {
             sqlServerConnection.queryForObject(select, String.class);
             result = false;
+            log.info("Hostname encontrado");
         } catch (EmptyResultDataAccessException exception) {
             result = true;
+            log.error("Hostname não encontrado");
         }
         return result;
     }
@@ -137,9 +143,10 @@ public class DatabaseConnection {
         try {
             result = sqlServerConnection.queryForObject(select, String.class);
             fkServidor = result;
-//            log.info("Máquina encontrada com sucesso!");
+            log.info("Máquina encontrada com sucesso!");
         } catch (EmptyResultDataAccessException exception) {
             saveHardwareData();
+            log.error("Máquina não encontrada!");
         }
         return result;
     }
@@ -254,7 +261,7 @@ public class DatabaseConnection {
             result = sqlServerConnection.queryForObject(query, String.class);
         } catch (DataAccessException e) {
             saveRamFixedData();
-//            log.error("\nErro ao conseguir os dados do banco - getRamId()\n");
+            log.error("\nErro ao conseguir os dados do banco - getRamId()\n");
         }
         return result;
     }
@@ -270,7 +277,7 @@ public class DatabaseConnection {
             result = sqlServerConnection.queryForObject(query, String.class);
         } catch (DataAccessException e) {
             saveCpuFixedData();
-//            log.error("\nErro ao conseguir os dados do banco - getCpuId()\n");
+            log.error("\nErro ao conseguir os dados do banco - getCpuId()\n");
         }
         return result;
     }
@@ -285,8 +292,10 @@ public class DatabaseConnection {
         );
         try {
             result = sqlServerConnection.queryForObject(query, String.class);
+            log.info("Disco encontrado com sucesso");
         } catch (DataAccessException e) {
             saveDiskFixedData();
+            log.error("Disco não encontrado");
         }
         return result;
     }
