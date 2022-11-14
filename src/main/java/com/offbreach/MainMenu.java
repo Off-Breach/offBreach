@@ -70,6 +70,9 @@ public class MainMenu extends javax.swing.JFrame {
 
         iconLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iconLogo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/offBreach300x172.png"))); // NOI18N
+        iconLogo.setMaximumSize(new java.awt.Dimension(120, 69));
+        iconLogo.setMinimumSize(new java.awt.Dimension(120, 69));
+        iconLogo.setPreferredSize(new java.awt.Dimension(120, 69));
         iconLogo.setRequestFocusEnabled(false);
         logo.add(iconLogo, java.awt.BorderLayout.CENTER);
 
@@ -82,7 +85,8 @@ public class MainMenu extends javax.swing.JFrame {
         inputView.setLayout(new javax.swing.BoxLayout(inputView, javax.swing.BoxLayout.Y_AXIS));
 
         emailView.setBackground(new java.awt.Color(230, 230, 230));
-        emailView.setMaximumSize(new java.awt.Dimension(393, 50));
+        emailView.setMaximumSize(new java.awt.Dimension(500, 50));
+        emailView.setMinimumSize(new java.awt.Dimension(500, 50));
         emailView.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 12, 5));
 
         emailLabel.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
@@ -97,26 +101,40 @@ public class MainMenu extends javax.swing.JFrame {
         inputView.add(emailView);
 
         passwordView.setBackground(new java.awt.Color(230, 230, 230));
-        passwordView.setMaximumSize(new java.awt.Dimension(381, 50));
+        passwordView.setMaximumSize(new java.awt.Dimension(500, 50));
+        passwordView.setMinimumSize(new java.awt.Dimension(500, 50));
+        passwordView.setPreferredSize(new java.awt.Dimension(500, 50));
+        passwordView.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 12, 5));
 
         passwordLabel.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         passwordLabel.setText("Senha");
         passwordView.add(passwordLabel);
 
         passwordTextField.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        passwordTextField.setMinimumSize(new java.awt.Dimension(300, 40));
         passwordTextField.setPreferredSize(new java.awt.Dimension(300, 40));
         passwordView.add(passwordTextField);
 
         inputView.add(passwordView);
 
         buttonView.setBackground(new java.awt.Color(230, 230, 230));
+        buttonView.setMaximumSize(new java.awt.Dimension(100, 50));
+        buttonView.setMinimumSize(new java.awt.Dimension(100, 50));
+        buttonView.setPreferredSize(new java.awt.Dimension(100, 50));
 
         loginButton.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         loginButton.setText("Login");
-        loginButton.setPreferredSize(new java.awt.Dimension(100, 40));
+        loginButton.setMaximumSize(new java.awt.Dimension(100, 35));
+        loginButton.setMinimumSize(new java.awt.Dimension(100, 35));
+        loginButton.setPreferredSize(new java.awt.Dimension(100, 35));
         loginButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 loginButtonMouseClicked(evt);
+            }
+        });
+        loginButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loginButtonActionPerformed(evt);
             }
         });
         buttonView.add(loginButton);
@@ -180,6 +198,10 @@ public class MainMenu extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(816, 569));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_loginButtonActionPerformed
 
     public void changeColor(JPanel hover, Color color) {
         hover.setBackground(color);

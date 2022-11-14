@@ -253,7 +253,7 @@ public class MainPage extends javax.swing.JFrame {
         dataInitValue.setText(Conversor.formatarSegundosDecorridos(data.getSistema().getTempoDeAtividade()));
         usoRamValue.setText(data.getMemoriaEmUso());
         statusValue.setText("Ativo");
-        usoDiscoValue.setText(Conversor.formatarBytes(data.getDiscoData().get(0).getLeituras()));
+        usoDiscoValue.setText(String.format("%.1f", data.getTempoAtividadeDisco()) + "%");
     }
 
     public void trySaveInLoop() {
@@ -263,6 +263,7 @@ public class MainPage extends javax.swing.JFrame {
             public void run() {
                 dbConnection.saveDataInLoop(usuario);
                 getLoocaData();
+                detectorUso.executar();
             }
         }, 0, 5000);
     }

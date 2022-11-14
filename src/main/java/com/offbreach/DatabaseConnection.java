@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 @Slf4j
 public class DatabaseConnection {
@@ -108,7 +107,7 @@ public class DatabaseConnection {
                 + ");";
         try {
             sqlLocalConnection.update(query);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
 
         }
     }
@@ -147,13 +146,13 @@ public class DatabaseConnection {
 
     public String getServerPublicName() {
         String idServidor = getMachineId();
-        String result = null;
+        String result;
         String select = String.format("SELECT popularName FROM servidor "
                 + "WHERE idServidor = %s",
                 idServidor);
         try {
             result = sqlServerConnection.queryForObject(select, String.class);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             result = hwData.getHostname();
         }
         return result;
@@ -161,18 +160,19 @@ public class DatabaseConnection {
 
     public Integer getServerDangerStatus() {
         String idServidor = getMachineId();
-        String result = null;
+        String result;
         String query = String.format(""
-                + "SELECT statusPerigo FROM servidor"
+                + "SELECT statusPerigo FROM servidor "
                 + "WHERE idServidor = %s",
                 idServidor);
+        System.out.println(query);
         try {
             result = sqlServerConnection.queryForObject(query, String.class);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             log.error("\nErro ao conseguir o status de perigo da máquina\n");
             result = "0";
         }
-        return Integer.parseInt(result);
+        return Integer.valueOf(result);
     }
 
     public void saveServerDangerStatus(Integer status) {
@@ -182,7 +182,7 @@ public class DatabaseConnection {
                 status, idServidor);
         try {
             sqlServerConnection.update(query);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             log.error("\n Erro ao inserir statusPeigo\n");
         }
     }
@@ -214,7 +214,7 @@ public class DatabaseConnection {
         );
         try {
             sqlServerConnection.update(insertRamFixedData);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             log.error("\nErro ao inserir dados no banco - saveRamFixedData\n");
         }
     }
@@ -226,7 +226,7 @@ public class DatabaseConnection {
         );
         try {
             sqlServerConnection.update(query);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             log.error("\nErro ao inserir dados no banco - saveCpuFixedData\n");
         }
     }
@@ -238,7 +238,7 @@ public class DatabaseConnection {
         );
         try {
             sqlServerConnection.update(query);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             log.error("\nErro ao inserir dados no banco - saveCpuFixedData\n");
         }
     }
@@ -252,7 +252,7 @@ public class DatabaseConnection {
                 getMachineId(), hwData.getHostname());
         try {
             result = sqlServerConnection.queryForObject(query, String.class);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             saveRamFixedData();
 //            log.error("\nErro ao conseguir os dados do banco - getRamId()\n");
         }
@@ -268,7 +268,7 @@ public class DatabaseConnection {
                 getMachineId(), hwData.getHostname());
         try {
             result = sqlServerConnection.queryForObject(query, String.class);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             saveCpuFixedData();
 //            log.error("\nErro ao conseguir os dados do banco - getCpuId()\n");
         }
@@ -285,7 +285,7 @@ public class DatabaseConnection {
         );
         try {
             result = sqlServerConnection.queryForObject(query, String.class);
-        } catch (Exception e) {
+        } catch (DataAccessException e) {
             saveDiskFixedData();
         }
         return result;
@@ -300,7 +300,6 @@ public class DatabaseConnection {
         String usoRam = hwData.getMemoryData().getEmUso().toString();
         Double tempoAtividadeDisco = hwData.getTempoAtividadeDisco();
         Double usoDisk = hwData.getUsoDisco();
-        formatter.setTimeZone(TimeZone.getDefault());
         String hora = formatter.format(date);
         String fkRam = getRamId();
         String fkCpu = getCpuId();
