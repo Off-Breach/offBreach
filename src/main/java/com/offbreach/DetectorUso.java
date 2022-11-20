@@ -1,9 +1,7 @@
 package com.offbreach;
 
-import java.io.BufferedReader;
+import com.github.britooo.looca.api.group.processos.Processo;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,12 +19,12 @@ public class DetectorUso {
         Integer newValue = calculateUse(currentValue);
         System.out.println(newValue);
         if (isServerBeingHacked(currentValue)) {
-            terminarProcesso();
+            terminarProcessos();
             System.out.println("Terminou um processo");
         }
         dbConnection.saveServerDangerStatus(newValue);
     }
-    
+
     private Boolean isServerBeingHacked(Integer index) {
         return index >= 200;
     }
@@ -58,45 +56,39 @@ public class DetectorUso {
             return -15;
         }
     }
-    
-    
 
-    private void terminarProcesso() {
+    public void terminarProcessos() {
         try {
-            Runtime r = Runtime.getRuntime();
-            Process p = r.exec("ps aux --sort=-%mem");
-            List<String> results;
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-                String inputLine;
-                results = new ArrayList<>();
-                while ((inputLine = in.readLine()) != null) {
-                    results.add(inputLine);
-                }
+            Processo processoMaiorusoRAM = hwData.getProcessoMaiorUsoRam(0);
+            if (processoMaiorusoRAM.getNome().contains("java")
+                    || processoMaiorusoRAM.getNome().contains("jvm")
+                    || processoMaiorusoRAM.getNome().contains("jre")) {
+                processoMaiorusoRAM = hwData.getProcessoMaiorUsoRam(1);
             }
-            Integer processPID = getProcessPID(results);
-            String command2 = "kill -9 " + processPID;
-            r.exec(command2);
+            List<Processo> processosComMesmoNome = hwData.getProcessGroupByName(processoMaiorusoRAM.getNome());
+            String sistemaOperacional = hwData.getSistema().getSistemaOperacional();
+            for (Processo processo : processosComMesmoNome) {
+                terminarCadaProcessoIndidualmente(processo, sistemaOperacional);
+            }
         } catch (IOException e) {
             System.out.println(e);
         }
     }
 
-    private Integer getProcessPID(List<String> output) {
-        String secondLine = output.get(1);
-        if (secondLine.contains("jvm") || secondLine.contains("java")) {
-            return formatOutputToGetPID(output, 2);
-        } else {
-            return formatOutputToGetPID(output, 1);
+    private void terminarCadaProcessoIndidualmente(Processo processo, String sistemaOperacional) throws IOException {
+        try {
+            String killCommand;
+            Runtime r = Runtime.getRuntime();
+            if (sistemaOperacional.toLowerCase().contains("windows")) {
+                killCommand = "taskkill /F /PID " + processo.getPid();
+            } else {
+                killCommand = "kill -9 " + processo.getPid();
+            }
+            System.out.println("Terminando o processo " + processo.getNome());
+            r.exec(killCommand);
+        } catch (IOException e) {
+            System.out.println(e);
         }
     }
 
-    private Integer formatOutputToGetPID(List<String> output, Integer index) {
-        String[] listOfOcurrences = output.get(index).split(" ");
-        for (int i = 1; i < listOfOcurrences.length; i++) {
-            if (!listOfOcurrences[i].isEmpty()) {
-                return Integer.valueOf(listOfOcurrences[i]);
-            }
-        }
-        return 0;
-    }
 }

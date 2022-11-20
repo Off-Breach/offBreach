@@ -4,6 +4,7 @@
  */
 package com.offbreach;
 
+import com.github.britooo.looca.api.group.processos.Processo;
 import com.github.britooo.looca.api.util.Conversor;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,6 +23,7 @@ public class MainPage extends javax.swing.JFrame {
     public HardwareData data = new HardwareData();
     public User usuario = new User();
     public DetectorUso detectorUso = new DetectorUso();
+
     public MainPage() {
         initComponents();
     }
@@ -204,12 +206,11 @@ public class MainPage extends javax.swing.JFrame {
     /**
      * @param user the command line arguments
      */
-
     public void setUserName(User user) {
         this.username = user.getNome();
     }
 
-    public void setUser(User user){
+    public void setUser(User user) {
         this.usuario = user;
     }
 
@@ -261,9 +262,10 @@ public class MainPage extends javax.swing.JFrame {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                dbConnection.saveDataInLoop(usuario);
-                getLoocaData();
-                detectorUso.executar();
+//                dbConnection.saveDataInLoop(usuario);
+//                getLoocaData();
+//                detectorUso.executar();
+//                System.out.println(data.getDispositivosUsb());
             }
         }, 0, 5000);
     }

@@ -5,7 +5,9 @@
 package com.offbreach;
 
 import java.awt.Color;
+import java.io.IOException;
 import javax.swing.JPanel;
+import oshi.hardware.UsbDevice;
 
 /**
  *
@@ -208,7 +210,6 @@ public class MainMenu extends javax.swing.JFrame {
     }
 
     private void loginButtonMouseClicked(java.awt.event.MouseEvent evt) {
-        HardwareData data = new HardwareData();
         DatabaseConnection dbConnection = new DatabaseConnection();
         MainPage mainPage = new MainPage();
         mainPage.setLocationRelativeTo(null);
@@ -233,7 +234,6 @@ public class MainMenu extends javax.swing.JFrame {
             mainPage.getLoocaData();
             mainPage.setVisible(true);
             mainMenu.dispose();
-            data.cadastrarSistema();
             mainPage.trySaveInLoop();
         }else {
         }

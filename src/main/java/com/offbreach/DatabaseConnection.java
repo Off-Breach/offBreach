@@ -301,18 +301,18 @@ public class DatabaseConnection {
     }
 
     public void saveDataInLoop(User funcionario) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
 
+        String fkDisk = getDiskId();
+        Double usoDisk = hwData.getUsoDisco();
         Double temperatura = hwData.getTemperatura();
         Double usoCpu = hwData.getProcessador().getUso();
         String usoRam = hwData.getMemoryData().getEmUso().toString();
         Double tempoAtividadeDisco = hwData.getTempoAtividadeDisco();
-        Double usoDisk = hwData.getUsoDisco();
-        String hora = formatter.format(date);
         String fkRam = getRamId();
         String fkCpu = getCpuId();
-        String fkDisk = getDiskId();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        String hora = formatter.format(date);
 
         String insertCpu = String.format("INSERT INTO DadosCpu(fkCpu, temperatura, uso, dtDado)"
                 + "VALUES (%s, %s, %s, '%s')",
