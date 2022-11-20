@@ -262,10 +262,9 @@ public class MainPage extends javax.swing.JFrame {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-//                dbConnection.saveDataInLoop(usuario);
-//                getLoocaData();
-//                detectorUso.executar();
-//                System.out.println(data.getDispositivosUsb());
+                dbConnection.saveDataInLoop(usuario);;
+                getLoocaData();
+                detectorUso.executar();
             }
         }, 0, 5000);
     }
