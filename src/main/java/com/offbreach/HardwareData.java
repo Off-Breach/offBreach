@@ -102,8 +102,18 @@ public class HardwareData {
         return todosProcessos.get(index);
     }
     
+    public Processo getProcessoMaiorUsoCpu(Integer index) {
+        List<Processo> todosProcessos = getTodosProcessos();
+        todosProcessos.sort(Comparator.comparing(Processo::getUsoCpu).reversed());
+        return todosProcessos.get(index);
+    }
+    
     public Integer getPIDProcessoMaiorUsoRam(Integer index) {
         return getProcessoMaiorUsoRam(index).getPid();
+    }
+    
+    public Integer getPIDProcessoMaiorUsoCpu(Integer index) {
+        return getProcessoMaiorUsoCpu(index).getPid();
     }
     
     public List<Processo> getProcessGroupByName(String nome) {

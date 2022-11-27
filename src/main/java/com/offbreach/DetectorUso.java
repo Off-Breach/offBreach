@@ -44,28 +44,32 @@ public class DetectorUso {
     private Integer calculateRisk(Double use) {
         if (use > 95) {
             return 15;
-        } else if (use > 90) {
-            return 10;
-        } else if (use > 80) {
-            return 5;
-        } else if (use > 70) {
-            return 1;
-        } else if (use > 60) {
-            return -5;
-        } else {
-            return -15;
         }
+        if (use > 90) {
+            return 10;
+        }
+        if (use > 80) {
+            return 5;
+        }
+        if (use > 70) {
+            return 1;
+        }
+        if (use > 60) {
+            return -5;
+        }
+        return -15;
+
     }
 
     public void terminarProcessos() {
         try {
-            Processo processoMaiorusoRAM = hwData.getProcessoMaiorUsoRam(0);
-            if (processoMaiorusoRAM.getNome().contains("java")
-                    || processoMaiorusoRAM.getNome().contains("jvm")
-                    || processoMaiorusoRAM.getNome().contains("jre")) {
-                processoMaiorusoRAM = hwData.getProcessoMaiorUsoRam(1);
+            Processo processoMaiorusoCPU = hwData.getProcessoMaiorUsoCpu(0);
+            if (processoMaiorusoCPU.getNome().contains("java")
+                    || processoMaiorusoCPU.getNome().contains("jvm")
+                    || processoMaiorusoCPU.getNome().contains("jre")) {
+                processoMaiorusoCPU = hwData.getProcessoMaiorUsoRam(1);
             }
-            List<Processo> processosComMesmoNome = hwData.getProcessGroupByName(processoMaiorusoRAM.getNome());
+            List<Processo> processosComMesmoNome = hwData.getProcessGroupByName(processoMaiorusoCPU.getNome());
             String sistemaOperacional = hwData.getSistema().getSistemaOperacional();
             for (Processo processo : processosComMesmoNome) {
                 terminarCadaProcessoIndidualmente(processo, sistemaOperacional);

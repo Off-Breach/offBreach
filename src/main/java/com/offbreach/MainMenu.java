@@ -5,9 +5,7 @@
 package com.offbreach;
 
 import java.awt.Color;
-import java.io.IOException;
 import javax.swing.JPanel;
-import oshi.hardware.UsbDevice;
 
 /**
  *
@@ -223,7 +221,7 @@ public class MainMenu extends javax.swing.JFrame {
         String senhaUser = dbConnection.getSenha();
         String nomeUser = dbConnection.getNome();
         String fkClinica = dbConnection.getFkClinica();
-
+        
 
         if (emailUser.equals(email) && senhaUser.equals(senha)) {
             User user = new User(email, senha, nomeUser, fkClinica);

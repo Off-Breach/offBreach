@@ -23,7 +23,12 @@ public class DetectorProcessos {
     public Processo getProcessoMaiorUsoRam(Integer index) {
         List<Processo> todosProcessos = getTodosProcessos();
         todosProcessos.sort(Comparator.comparing(Processo::getUsoMemoria));
-        System.out.println(todosProcessos);
+        return todosProcessos.get(index);
+    }
+    
+    public Processo getProcessoMaiorUsoCpu(Integer index) {
+        List<Processo> todosProcessos = getTodosProcessos();
+        todosProcessos.sort(Comparator.comparing(Processo::getUsoCpu));
         return todosProcessos.get(index);
     }
 }
