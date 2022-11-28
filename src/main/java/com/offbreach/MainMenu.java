@@ -5,6 +5,8 @@
 package com.offbreach;
 
 import java.awt.Color;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.JPanel;
 
 /**
@@ -12,16 +14,17 @@ import javax.swing.JPanel;
  * @author rafae
  */
 public class MainMenu extends javax.swing.JFrame {
-
+    DatabaseConnection dbConnection;
     /**
      * Creates new form MainMenu
      */
     public MainMenu() {
         initComponents();
         loadingIcon.setVisible(false);
+        dbConnection = new DatabaseConnection();
     }
-
-
+    
+    
     static MainMenu mainMenu = new MainMenu();
 
     /**
@@ -53,6 +56,14 @@ public class MainMenu extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         header.setBackground(new java.awt.Color(9, 80, 111));
         header.setPreferredSize(new java.awt.Dimension(800, 50));
@@ -203,39 +214,47 @@ public class MainMenu extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_loginButtonActionPerformed
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        System.out.println("Fechou a janela agora");
+    }//GEN-LAST:event_formWindowClosed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        System.out.println("Tentando fazer essa porra funcionar.");
+        
+        dbConnection.updateServerOnStatus(false);
+        System.out.println("talvez funcionou n sei.");
+    }//GEN-LAST:event_formWindowClosing
+    
     public void changeColor(JPanel hover, Color color) {
         hover.setBackground(color);
     }
-
+    
     private void loginButtonMouseClicked(java.awt.event.MouseEvent evt) {
-        DatabaseConnection dbConnection = new DatabaseConnection();
         MainPage mainPage = new MainPage();
         mainPage.setLocationRelativeTo(null);
-
-
+        
         String email = emailTextField.getText();
         String senha = String.valueOf(passwordTextField.getPassword());
-
+        
         dbConnection.setConnection(email, senha);
         String emailUser = dbConnection.getEmail();
         String senhaUser = dbConnection.getSenha();
         String nomeUser = dbConnection.getNome();
         String fkClinica = dbConnection.getFkClinica();
         
-
         if (emailUser.equals(email) && senhaUser.equals(senha)) {
             User user = new User(email, senha, nomeUser, fkClinica);
             mainPage.setUser(user);
             mainPage.setUserName(user);
             dbConnection.fkClinica = dbConnection.getFkClinica();
             dbConnection.saveHardwareData();
-            mainPage.getLoocaData();
             mainPage.setVisible(true);
-            mainMenu.dispose();
+            dbConnection.updateServerOnStatus(true);
+            this.mainMenu.dispose();
             mainPage.trySaveInLoop();
-        }else {
+        } else {
         }
-    }                                        
+    }
 
     /**
      * @param args the command line arguments
@@ -268,6 +287,13 @@ public class MainMenu extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MainMenu().setVisible(true);
+            }
+        });
+        
+        mainMenu.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Fechou a janela!");
             }
         });
     }

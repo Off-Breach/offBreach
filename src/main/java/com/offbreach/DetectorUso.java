@@ -3,42 +3,49 @@ package com.offbreach;
 import com.github.britooo.looca.api.group.processos.Processo;
 import java.io.IOException;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  * @author rafae
  */
+@Slf4j
 public class DetectorUso {
 
     HardwareData hwData = new HardwareData();
     DatabaseConnection dbConnection = new DatabaseConnection();
 
-    public void executar() {
+    public void executar(Double usoCpu, Double usoRam, Double usoDisco) {
         Integer currentValue = dbConnection.getServerDangerStatus();
         System.out.println(currentValue);
-        Integer newValue = calculateUse(currentValue);
-        System.out.println(newValue);
-        if (isServerBeingHacked(currentValue)) {
-            terminarProcessos();
-            System.out.println("Terminou um processo");
+        if (currentValue == 300) {
+            dbConnection.resetServerDangerStatus();
+            dbConnection.updateServerOnStatus(false);
+            encerrarServidor(); 
+        } else {
+            Integer newValue = calculateUse(currentValue, usoCpu, usoRam);
+            System.out.println(newValue);
+            if (isServerBeingHacked(newValue)) {
+                log.info("Nós detectamos um ataque ao seu servidor. Iniciando encerramento de processos!");
+                terminarProcessos();
+            } else {
+                dbConnection.saveServerDangerStatus(newValue);
+            }
         }
-        dbConnection.saveServerDangerStatus(newValue);
     }
 
     private Boolean isServerBeingHacked(Integer index) {
         return index >= 200;
     }
 
-    private Integer calculateUse(Integer currentIndex) {
-        Double usoRamPercentage = ((double) hwData.getMemoryData().getEmUso() / hwData.getTotalMemoria()) * 100;
-        Double usoCpuPercentage = Double.min(hwData.getProcessador().getUso() * 1.5, 100);
-        Double usoDiscoPercentage = hwData.getTempoAtividadeDisco();
+    private Integer calculateUse(Integer currentIndex, Double usoCpu, Double usoRam) {
+        Double usoRamPercentage = (usoRam / hwData.getTotalMemoria()) * 100;
+        Double usoCpuPercentage = Double.min(usoCpu, 100);
 
         currentIndex += calculateRisk(usoRamPercentage);
         currentIndex += calculateRisk(usoCpuPercentage);
-        currentIndex += calculateRisk(usoDiscoPercentage);
 
-        return Math.min(200, Math.max(currentIndex, 0));
+        return Math.min(215, Math.max(currentIndex, 0));
     }
 
     private Integer calculateRisk(Double use) {
@@ -63,16 +70,15 @@ public class DetectorUso {
 
     public void terminarProcessos() {
         try {
-            Processo processoMaiorusoCPU = hwData.getProcessoMaiorUsoCpu(0);
-            if (processoMaiorusoCPU.getNome().contains("java")
-                    || processoMaiorusoCPU.getNome().contains("jvm")
-                    || processoMaiorusoCPU.getNome().contains("jre")) {
-                processoMaiorusoCPU = hwData.getProcessoMaiorUsoRam(1);
-            }
-            List<Processo> processosComMesmoNome = hwData.getProcessGroupByName(processoMaiorusoCPU.getNome());
+            List<Processo> processosMaiorusoCPU = hwData.getProcessosMaiorUsoCpu();
+            System.out.println(processosMaiorusoCPU);
             String sistemaOperacional = hwData.getSistema().getSistemaOperacional();
-            for (Processo processo : processosComMesmoNome) {
-                terminarCadaProcessoIndidualmente(processo, sistemaOperacional);
+            for (Processo processo : processosMaiorusoCPU) {
+                if (!processo.getNome().contains("jvm")
+                        || !processo.getNome().contains("java")
+                        || !processo.getNome().contains("jre")) {
+                    terminarCadaProcessoIndidualmente(processo, sistemaOperacional);
+                }
             }
         } catch (IOException e) {
             System.out.println(e);
@@ -91,7 +97,24 @@ public class DetectorUso {
             System.out.println("Terminando o processo " + processo.getNome());
             r.exec(killCommand);
         } catch (IOException e) {
+            log.error(String.format("Erro ao terminar o processo: %s", processo.toString()));
             System.out.println(e);
+        }
+    }
+    
+    private void encerrarServidor() {
+        try {
+            Runtime r = Runtime.getRuntime();
+            String sistemaOperacional = hwData.getSistema().getSistemaOperacional();
+            String shutDownCommand;
+            if (sistemaOperacional.toLowerCase().contains("windows")) {
+                shutDownCommand = "shutdown /s";
+            } else {
+                shutDownCommand = "sudo shutdown now";
+            }
+            r.exec(shutDownCommand);
+        } catch (IOException iOException) {
+            log.error("Erro ao desligar a máquina. Erro: " + iOException.toString());
         }
     }
 

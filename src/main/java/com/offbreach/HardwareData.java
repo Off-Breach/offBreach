@@ -105,7 +105,20 @@ public class HardwareData {
     public Processo getProcessoMaiorUsoCpu(Integer index) {
         List<Processo> todosProcessos = getTodosProcessos();
         todosProcessos.sort(Comparator.comparing(Processo::getUsoCpu).reversed());
+        System.out.println(todosProcessos);
         return todosProcessos.get(index);
+    }
+    
+    public List<Processo> getProcessosMaiorUsoCpu() {
+        List<Processo> todosProcessos = getTodosProcessos();
+        todosProcessos.sort(Comparator.comparing(Processo::getUsoCpu).reversed());
+        System.out.println(todosProcessos);
+        List<Processo> doisProcessosComMaisUsoCpu = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            Processo processo = todosProcessos.get(i);
+            doisProcessosComMaisUsoCpu.add(i, processo);
+        }
+        return doisProcessosComMaisUsoCpu;
     }
     
     public Integer getPIDProcessoMaiorUsoRam(Integer index) {

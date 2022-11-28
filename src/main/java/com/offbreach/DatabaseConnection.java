@@ -194,23 +194,49 @@ public class DatabaseConnection {
         }
     }
 
+    public void resetServerDangerStatus() {
+        String idServidor = getMachineId();
+        String query = String.format(""
+                + "UPDATE servidor set statusPerigo = %s WHERE idServidor = %s",
+                0, idServidor);
+        try {
+            sqlServerConnection.update(query);
+        } catch (DataAccessException e) {
+            log.error("\n Erro ao inserir statusPeigo\n");
+        }
+    }
+
     public void saveHardwareData() {
         hwData.setHostname();
         String hostname = hwData.getHostname();
         String sistema = hwData.getSistema().getSistemaOperacional();
 
-        String insert = String.format("INSERT INTO servidor (hostName, sistemaOperacional, popularName, fkClinica)"
-                + "VALUES ('%s', '%s', '%s', %s)",
-                hostname, sistema, hostname, fkClinica);
+        String insert = String.format("INSERT INTO servidor (hostName, sistemaOperacional, popularName, statusPerigo, statusLigado, fkClinica)"
+                + "VALUES ('%s', '%s', '%s', %s, %s, %s)",
+                hostname, sistema, hostname, 0, 1, fkClinica);
         if (this.verifyHostname()) {
             try {
                 sqlServerConnection.update(insert);
+                saveRamFixedData();
+                saveCpuFixedData();
+                saveDiskFixedData();
                 log.info("\nMáquina inserida com sucesso\n");
             } catch (DataAccessException error) {
                 log.error("Erro ao inserir máquina no banco");
             }
         } else {
             log.warn("\nMáquina já cadastrada\n");
+        }
+    }
+
+    public void updateServerOnStatus(Boolean bool) {
+        String idServidor = getMachineId();
+        String update = String.format("UPDATE servidor SET statusLigado = %s WHERE idServidor = %s", bool ? 1 : 0, idServidor);
+        System.out.println(update);
+        try {
+            sqlServerConnection.update(update);
+        } catch (DataAccessException e) {
+            log.error("Erro ao atualizar o status de atividade da máquina. Erro: " + e);
         }
     }
 

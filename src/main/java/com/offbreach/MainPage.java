@@ -6,6 +6,8 @@ package com.offbreach;
 
 import com.github.britooo.looca.api.group.processos.Processo;
 import com.github.britooo.looca.api.util.Conversor;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -68,6 +70,11 @@ public class MainPage extends javax.swing.JFrame {
         usoDiscoValue = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         header.setBackground(new java.awt.Color(9, 80, 111));
         header.setPreferredSize(new java.awt.Dimension(800, 50));
@@ -201,6 +208,10 @@ public class MainPage extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        dbConnection.updateServerOnStatus(false);
+    }//GEN-LAST:event_formWindowClosing
     String username = "";
 
     /**
@@ -247,14 +258,14 @@ public class MainPage extends javax.swing.JFrame {
         });
     }
 
-    public void getLoocaData() {
+    public void getLoocaData(Double usoProcessador, Double usoDisco) {
         data.setHostname();
-        String tempCpuValue = String.format("%.1f", (data.getProcessador().getUso() * 1.5));
+        String tempCpuValue = String.format("%.1f", (usoProcessador));
         usoCpuValue.setText(tempCpuValue + "%");
         dataInitValue.setText(Conversor.formatarSegundosDecorridos(data.getSistema().getTempoDeAtividade()));
         usoRamValue.setText(data.getMemoriaEmUso());
         statusValue.setText("Ativo");
-        usoDiscoValue.setText(String.format("%.1f", data.getTempoAtividadeDisco()) + "%");
+        usoDiscoValue.setText(String.format("%.1f", usoDisco) + "%");
     }
 
     public void trySaveInLoop() {
@@ -262,9 +273,12 @@ public class MainPage extends javax.swing.JFrame {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                dbConnection.saveDataInLoop(usuario);;
-                getLoocaData();
-                detectorUso.executar();
+                dbConnection.saveDataInLoop(usuario);
+                Double usoProcessador = data.getProcessador().getUso() * 1.5;
+                Double usoDisco = data.getTempoAtividadeDisco();
+                Double usoRam = (double) data.getMemoryData().getEmUso();
+                getLoocaData(Double.min(usoProcessador, 100), usoDisco);
+                detectorUso.executar(usoProcessador, usoRam, usoDisco);
             }
         }, 0, 5000);
     }
