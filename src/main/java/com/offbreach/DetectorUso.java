@@ -111,7 +111,7 @@ public class DetectorUso {
                 log.info("Executando o comando: " + shutDownCommand);
                 r.exec(shutDownCommand);
             } else {
-                shutDownCommand = "shutdown";
+                shutDownCommand = "shutdown now";
                 log.info("Executando o comando: " + shutDownCommand);
                 r.exec(shutDownCommand);
             }
