@@ -92,7 +92,7 @@ public class DetectorUso {
             if (sistemaOperacional.toLowerCase().contains("windows")) {
                 killCommand = "taskkill /F /PID " + processo.getPid();
             } else {
-                killCommand = "kill -9 " + processo.getPid();
+                killCommand = "sudo kill -9 " + processo.getPid();
             }
             System.out.println("Terminando o processo " + processo.getNome());
             r.exec(killCommand);
@@ -112,6 +112,7 @@ public class DetectorUso {
             } else {
                 shutDownCommand = "sudo shutdown now";
             }
+            log.info("Executando o comando: " + shutDownCommand);
             r.exec(shutDownCommand);
         } catch (IOException iOException) {
             log.error("Erro ao desligar a máquina. Erro: " + iOException.toString());
