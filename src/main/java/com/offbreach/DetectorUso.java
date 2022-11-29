@@ -21,7 +21,7 @@ public class DetectorUso {
         if (currentValue == 300) {
             dbConnection.resetServerDangerStatus();
             dbConnection.updateServerOnStatus(false);
-            encerrarServidor(); 
+            encerrarServidor();
         } else {
             Integer newValue = calculateUse(currentValue, usoCpu, usoRam);
             System.out.println(newValue);
@@ -42,7 +42,6 @@ public class DetectorUso {
         Double usoRamPercentage = (usoRam / hwData.getTotalMemoria()) * 100;
         Double usoCpuPercentage = Double.min(usoCpu, 100);
 
-        currentIndex += calculateRisk(usoRamPercentage);
         currentIndex += calculateRisk(usoCpuPercentage);
 
         return Math.min(215, Math.max(currentIndex, 0));
@@ -50,21 +49,21 @@ public class DetectorUso {
 
     private Integer calculateRisk(Double use) {
         if (use > 95) {
-            return 15;
+            return 25;
         }
         if (use > 90) {
-            return 10;
+            return 15;
         }
         if (use > 80) {
-            return 5;
+            return 10;
         }
         if (use > 70) {
-            return 1;
+            return 5;
         }
-        if (use > 60) {
-            return -5;
+        if (use > 50) {
+            return -10;
         }
-        return -15;
+        return -20;
 
     }
 
@@ -92,7 +91,7 @@ public class DetectorUso {
             if (sistemaOperacional.toLowerCase().contains("windows")) {
                 killCommand = "taskkill /F /PID " + processo.getPid();
             } else {
-                killCommand = "sudo kill -9 " + processo.getPid();
+                killCommand = "kill -9 " + processo.getPid();
             }
             System.out.println("Terminando o processo " + processo.getNome());
             r.exec(killCommand);
@@ -101,7 +100,7 @@ public class DetectorUso {
             System.out.println(e);
         }
     }
-    
+
     private void encerrarServidor() {
         try {
             Runtime r = Runtime.getRuntime();
@@ -109,11 +108,13 @@ public class DetectorUso {
             String shutDownCommand;
             if (sistemaOperacional.toLowerCase().contains("windows")) {
                 shutDownCommand = "shutdown /s";
+                log.info("Executando o comando: " + shutDownCommand);
+                r.exec(shutDownCommand);
             } else {
-                shutDownCommand = "sudo shutdown now";
+                shutDownCommand = "shutdown";
+                log.info("Executando o comando: " + shutDownCommand);
+                r.exec(shutDownCommand);
             }
-            log.info("Executando o comando: " + shutDownCommand);
-            r.exec(shutDownCommand);
         } catch (IOException iOException) {
             log.error("Erro ao desligar a máquina. Erro: " + iOException.toString());
         }
